@@ -1,0 +1,13 @@
+*~
+*.o
+*.d
+build/
+*.bin
+*.gch
+obj/
+bin/
+*ValgrindOut.xml*
+others/test.ini
+massif.*
+cachegrind.*
+testt.ini
