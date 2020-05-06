@@ -14,7 +14,7 @@ int main()
 {
     char filename[] = "tests/test.ini", *buff1, *buff2, *buff3, *buff4, *buff5;
     lci_data *ini=NULL, *tmp=NULL;
-    int len=0, elen=50; 
+    int len=0, elen=50, lens=0, lenp=0, lenv=0, lenc=0; 
     FILE *fp;
 
     fp = fopen(filename, "rb");
@@ -33,6 +33,11 @@ int main()
 
     printf("\n"); 
 
+    lens=18;
+    lenp=18;
+    lenv=18;
+    lenc=44;
+
 
     tmp = ini;
     while(tmp != NULL){
@@ -44,7 +49,8 @@ int main()
         snprintf(buff5, elen, "'%s' %3ld", tmp->errorMsg, tmp->errorMsgLen);
 
 
-        printf("LN: %ld,\tLL: %ld,\tSE: %*s, P: %*s, V: %*s, C: %*s, ER: %*s \n", tmp->lineNum, tmp->lineLen,len+6, buff1, len+6, buff2, len+6, buff3, len+6, buff4, elen, buff5);
+        printf("LN: %ld,\tLL: %ld,\tSE: %*s,%2ld P: %*s,%2ld V: %*s,%2ld C: %*s,%2ld ER: %*s \n", tmp->lineNum, tmp->lineLen, lens, buff1,tmp->sectionStartPos,
+            lenp, buff2, tmp->paramStartPos, lenv, buff3, tmp->valueStartPos, lenc, buff4, tmp->commentStartPos, elen, buff5);
 
         tmp=tmp->next;
     }

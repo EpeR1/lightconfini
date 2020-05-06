@@ -8,12 +8,16 @@
 - Converting readed values to int/float/string.
 - Building linked list from parameters.
 - Multiline values are supported.
-- Reading comments.  
+- Reading comments.
+- UNICODE/UTF8 support.
+- Escape sequence support.
 
-Automatically switch between UNIX ('\n') and Windows ('\r\n') line endings. MAC ('\r' only) is not supported currently.  
-Comments can be started with ';' or '#' signs.  
-Multiline values are supported is they are surrounded with Double-Quotation-Mark (") signs.  
+**Automatically switch** between **UNIX ('\n')** and **Windows ('\r\n')** line endings. MAC ('\r' only) is not supported currently.  
+**Comments** can be started with **';'** or **'#'** signs.  
+**Multiline** values are supported if they are surrounded **with Double-Quotation-Mark (")** signs.  
 Uses Finite State Machine technique for file processing.  
+**Sections, Parameter names** can be **ASCII** alphabetical or numerical characters.  
+**Values** in alone also ASCII, or between Double-Quotation-Marks(") can be **any UNICODE/UTF8** characters. 
 
 
 ## Future Plans  
