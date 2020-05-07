@@ -17,7 +17,8 @@
 **Multiline** values are supported if they are surrounded **with Double-Quotation-Mark (")** signs.  
 Uses Finite State Machine technique for file processing.  
 **Sections, Parameter names** can be **ASCII** alphabetical or numerical characters.  
-**Values** in alone also ASCII, or between Double-Quotation-Marks(") can be **any UNICODE/UTF8** characters. 
+**Values** in alone also ASCII, or between Double-Quotation-Marks(") can be **any UNICODE/UTF8** characters.  
+Maximum line length can be 2^64/2 = 2^63 characters.  
 
 
 ## Future Plans  

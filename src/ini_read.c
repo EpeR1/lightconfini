@@ -74,7 +74,9 @@ char unescape(char c){
         return '\t';
     } else if(c == 'v'){     //Vertical tab
         return '\v';
-    } else if(c == '\\'){    //Backslash
+    } else if(c == 'e'){
+        return 0x1B;
+    /* } else if(c == '\\'){    //Backslash
         return '\\';
     } else if(c == '\''){    //Apostrophe
         return '\'';
@@ -82,6 +84,7 @@ char unescape(char c){
         return '\"';
     } else if(c == '?'){     //Question mark
         return '?';
+    */
     } else if(c < 0x20){
         return '~';
     } else {                // jó az eredeti
@@ -161,7 +164,7 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                     if(data->nodeState == MULTILINE){       //Elküldjük gyűjteni
                         state = DqmW;   // Vagy ValW ??
                         j = data->valueLen-2;   //(x-1) => \0; (x-2) => j--;
-                        data->value = strResize(data->value, data->valueLen, data->valueLen+len);
+                        data->value = strResize(data->value, data->valueLen, data->valueLen+len);   // strResize(ptr, oldsize, newsize)
                         i--;
                     } else if(in[i] == '\n' || in[i] == '\r' || in[i] == '\0'){   //sorvége
                         state = Stop;                   // Sorvége
@@ -174,7 +177,7 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                         data->comment = strResize(data->comment, data->commentLen, len);
                         memset(data->comment, 0, len);
                         data->commentStartPos = i;
-                        data->sectionLen = 0;   //Hogy pucoljon
+                        data->sectionStartPos = -1;   //Hogy pucoljon
                     } else if(in[i] == '['){     //Szekció kezdődik
                         j = -1;
                         state = SectEndW;
@@ -207,7 +210,7 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                         data->comment = strResize(data->comment, data->commentLen, len);
                         memset(data->comment, 0, len);
                         data->commentStartPos = i;
-                        data->sectionLen = 0;      //Hogy pucoljon
+                        data->sectionStartPos = -1;      //Hogy pucoljon
                     } else if(in[i] == '['){     //Szekció lesz
                         j = -1;
                         state = SectEndW;
@@ -250,7 +253,10 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                         state = SectEndD;
                         data->section[j] = '\0';
                         data->sectionLen = j+1;
-                    } else if(isalnum(in[i]) || in[i] == '/' || in[i] == ' '){   
+                        if(j == 0){ //empty section
+                            state = Error;
+                        }
+                    } else if(isalnum(in[i]) || in[i]=='/' || in[i]==' ' || in[i]=='_' || in[i]=='-' || in[i]=='.'){   
                         data->section[j] = in[i];
                     } else /*if((in[i] >= 0x00 && in[i] < 0x20) || in[i] == ';' || in[i] == '#' )*/ {       // túl korai sorvég, SP(), vagy komment 
                         state = Error;
@@ -291,7 +297,7 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                         state = ValPSP;
                         data->param[j] = '\0';
                         data->paramLen = j + 1;
-                    } else if(isalnum(in[i]) || in[i] == '[' || in[i] == ']'){   //A paraméter neve vagy tömb támogatása (Mint PHP-ben)
+                    } else if(isalnum(in[i]) || in[i]=='[' || in[i]==']' || in[i]=='_' || in[i]=='-' || in[i]=='.'){   //A paraméter neve vagy tömb támogatása (Mint PHP-ben)
                         data->param[j] = in[i];
                     } else if(isspace(in[i]) && in[i] != '\r' && in[i] != '\n'){   //Végén csak space lehet, egyenlő nélkül sorvég nem
                         state = EqW2;
@@ -377,7 +383,7 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                     } else if( in[i] == '\\' ){  //Backslash jött  //egymás után több backslash is lehet??
                         j--;            //A '\' nem számít bele!
                         state = Bslsh;
-                    } else if(  isalnum(in[i]) ){           //Normál betűk, space() csak idézőjelben jöhet!
+                    } else if(  isalnum(in[i]) || in[i]=='_' || in[i]=='-' || in[i]=='.' ){           //Normál betűk, space() csak idézőjelben jöhet!
                         data->value[j] = in[i];
                     } else if(isspace(in[i])){            //Aposztróf nélüli space -> sorvég
                         data->value[j] = '\0';
@@ -475,7 +481,7 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                     memset(data->errorMsg, 0, 256) ; 
 
                     if(pstate == SectEndW || pstate == SectEndD){
-                        data->errorMsgLen = snprintf(data->errorMsg, 256, "Illegal character at SECTION! (line: %ld, pos: %ld)", data->lineNum, i+1);
+                        data->errorMsgLen = snprintf(data->errorMsg, 256, "Illegal character or EMPTY SECTION! (line: %ld, pos: %ld)", data->lineNum, i+1);
                     } else if(pstate == EqW1 || pstate == EqW2){
                         data->errorMsgLen = snprintf(data->errorMsg, 256, "Illegal character at PARAMETER! (line: %ld, pos: %ld)", data->lineNum, i+1);
                     } else if(pstate == ValPSP || pstate == ValW || pstate == ValFSP ){
@@ -505,6 +511,9 @@ struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len){
                         data->value = strResize(data->value, len, data->valueLen);
                         data->comment = strResize(data->comment, len, data->commentLen);
                         data->errorMsg = strResize(data->errorMsg, 256, data->errorMsgLen);
+                        if(data->section==NULL && data->param==NULL && data->value==NULL && data->comment==NULL && data->errorMsg==NULL){
+                            data->nodeState = EMPTY;
+                        }
                         return data;
                     } else {                    //minden más-> hiba
                         state = Error;
@@ -539,16 +548,16 @@ lci_data *createNode( lci_data *head, int64_t lineLen ){
 
     memset(curr->section, 0, lineLen);
     curr->sectionLen = lineLen;
-    curr->sectionStartPos = 0;
+    curr->sectionStartPos = -1;
     memset(curr->param, 0, lineLen);
     curr->paramLen = lineLen;
-    curr->paramStartPos = 0;
+    curr->paramStartPos = -1;
     memset(curr->value, 0, lineLen);
     curr->valueLen = lineLen;
-    curr->valueStartPos = 0;
+    curr->valueStartPos = -1;
     memset(curr->comment, 0, lineLen);
     curr->commentLen = lineLen;
-    curr->commentStartPos = 0;
+    curr->commentStartPos = -1;
     memset(curr->errorMsg, 0, lineLen);
     curr->errorMsgLen=lineLen;
     curr->next = NULL;

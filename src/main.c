@@ -12,7 +12,7 @@
   
 int main()
 {
-    char filename[] = "tests/test.ini", *buff1, *buff2, *buff3, *buff4, *buff5;
+    char filename[] = "tests/test0.ini", *buff1, *buff2, *buff3, *buff4, *buff5;
     lci_data *ini=NULL, *tmp=NULL;
     int len=0, elen=50, lens=0, lenp=0, lenv=0, lenc=0; 
     FILE *fp;

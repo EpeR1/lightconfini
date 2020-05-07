@@ -8,23 +8,23 @@
 typedef struct lci_data {
 
     enum nodeState {EMPTY, READY, CONTINUE, MULTILINE, ERROR } nodeState;
-    uint64_t  lineNum;
-    uint64_t  lineLen;
+    int64_t  lineNum;
+    int64_t  lineLen;
 
     char *section;
-    uint64_t  sectionLen;
-    uint64_t  sectionStartPos;
+    int64_t  sectionLen;
+    int64_t  sectionStartPos;
     char *param;
-    uint64_t  paramLen;
-    uint64_t  paramStartPos;
+    int64_t  paramLen;
+    int64_t  paramStartPos;
     char *value;
-    uint64_t  valueLen;
-    uint64_t  valueStartPos;
+    int64_t  valueLen;
+    int64_t  valueStartPos;
     char *comment;
-    uint64_t  commentLen;
-    uint64_t  commentStartPos;
+    int64_t  commentLen;
+    int64_t  commentStartPos;
     char *errorMsg;
-    uint64_t  errorMsgLen;
+    int64_t  errorMsgLen;
 
     struct lci_data *next; 
 } lci_data;
