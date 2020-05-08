@@ -2,7 +2,7 @@
 #define INI_READ_H_INCLUDED
 // #include "deftypes.h"
 #include <stdint.h> /* int64_t*/
-
+ 
 
 
 typedef struct lci_data {
@@ -12,7 +12,7 @@ typedef struct lci_data {
     int64_t  lineLen;
 
     char *section;
-    int64_t  sectionLen;
+    int64_t  sectionLen; 
     int64_t  sectionStartPos;
     char *param;
     int64_t  paramLen;

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h> 
+#include <stdbool.h>   
 
 #include <linux/limits.h> /* PATH_MAX*/
 #include "ini_rw.h"
@@ -26,12 +26,36 @@ int main()
     buff3 = malloc((len+3)*sizeof(char));
     buff4 = malloc((len+3)*sizeof(char));
     buff5 = malloc((elen+3)*sizeof(char));
+memset(buff1, 0, (len+3)*sizeof(char));
+memset(buff2, 0, (len+3)*sizeof(char));
+memset(buff3, 0, (len+3)*sizeof(char));
+memset(buff4, 0, (len+3)*sizeof(char));
+memset(buff5, 0, (elen+3)*sizeof(char));
 
+    char *aa, *bb, *cc;
+    aa = (char *) malloc(20*sizeof(char));
+    aa[0] = 'q';
+    aa[1] = 'w';
+    aa[2] = 'e';
+    aa[3] = '\0';
+    bb = (char *) malloc(30*sizeof(char));
+
+    cc=aa;
+    strncpy(bb,aa,20);
+    free(aa);
+    free(NULL);
+
+    printf("\n%s\n", bb);
+
+    
+
+
+    
+
+
+    printf("\nLineMax: %d\n\n",len); 
 
     ini = iniReadOut(filename);
-
-
-    printf("\n"); 
 
     lens=18;
     lenp=18;
