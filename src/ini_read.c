@@ -41,11 +41,13 @@ char *strResize(char *ptr, size_t oldsize, size_t newsize){
         } else if(ptr == NULL) {
             return tmp;
         } else if(newsize > oldsize) {  // FEL
-            strncpy(tmp, ptr, oldsize); // old < new
+            //strncpy(tmp, ptr, oldsize); // old < new
+            snprintf(tmp, newsize, "%s", ptr);
             free(ptr); 
             return tmp;
         } else if(newsize < oldsize){   //LE
-            strncpy(tmp, ptr, newsize); // new < old
+            //strncpy(tmp, ptr, newsize); // new < old
+            snprintf(tmp, newsize, "%s", ptr);
             free(ptr);
             return tmp;
         } else {            //Ide sosem jutunk
