@@ -11,7 +11,7 @@ CC = gcc
 LD = gcc
 
 # fordító flagek
-debug: CFLAGS = -g -Wall -g3 -ggdb -O0  -fmessage-length=0 # CodeBlocks-nak
+debug: CFLAGS = -g -Wall -g3 -ggdb -O0  -fmessage-length=0 -lefence # CodeBlocks-nak
 #debug: CFLAGS = -O0 -g3 -Wall -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)"
 #       -fmessage-length=0 -> "N" karakter hibaüzenet, N=0 akkor minden üzenet új sorba
 #       -g3 -> Level 3 debug info
@@ -19,9 +19,9 @@ debug: CFLAGS = -g -Wall -g3 -ggdb -O0  -fmessage-length=0 # CodeBlocks-nak
 #       -c nyelvvel kapcsolatos
 
 # fordíto flagek
-CFLAGS = -Wall -ggdb
+CFLAGS = -Wall -ggdb -lefence
 # Linker flagek
-LDFLAGS =
+LDFLAGS = -lefence
 
 # tisztára törlés
 RM = /bin/rm -rf

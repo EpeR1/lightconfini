@@ -33,6 +33,8 @@ enum ini_states {Start, BgnSp, CommEndW, SectEndW, SectEndD, EqW1, EqW2, ValPSP,
 
 struct lci_data *iniReadOut(const char *filename);
 int64_t getFileMaxLineLen(FILE *tfd);
+char *strResize(char *ptr, size_t oldsize, size_t newsize);
+lci_data *destroyNodes( lci_data *head); 
 
 
 
