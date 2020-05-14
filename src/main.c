@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
 
 
     fp = fopen(filename, "rb");
-    len = getFileMaxLineLen(fp)+0;
+    len = getFileMaxLineLen(fp)+1;
     if(fp != NULL) { fclose(fp);}
 
     len = 24000;    //Debug

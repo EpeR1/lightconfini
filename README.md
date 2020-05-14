@@ -20,10 +20,8 @@ Uses Finite State Machine technique for file processing.
 **Values** in alone also ASCII, or between Double-Quotation-Marks(") can be **any UNICODE/UTF8** characters.  
 Maximum line length can be 2^64/2 = 2^63 characters.  
 
-
 ## Future Plans  
 
 - Writing and Rewriting support for ini files.
 - Writing support for comments.
 - Modifying one or more values/parameters/sections in ini files.
-

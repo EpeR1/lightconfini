@@ -7,7 +7,7 @@
 
 typedef struct lci_data {
 
-    enum nodeState {EMPTY, READY, CONTINUE, MULTILINE, ERROR } nodeState;
+    enum nodeState {lci_EMPTY, lci_READY, lci_CONTINUE, lci_MULTILINE, lci_ERROR } nodeState;
     int64_t  lineNum;
     int64_t  lineLen;
 
@@ -20,7 +20,7 @@ typedef struct lci_data {
     char *value;
     int64_t  valueLen;
     int64_t  valueStartPos;
-    enum valueDraw {EMPTYVAL, SIMPLEVAL, MULTILINEVAL, DQUOTEDVAL} valueDraw;
+    enum valueDraw {lci_EMPTYVAL, lci_SIMPLEVAL, lci_MULTILINEVAL, lci_DQUOTEDVAL} valueDraw;
     char *comment;
     int64_t  commentLen;
     int64_t  commentStartPos;
@@ -30,12 +30,29 @@ typedef struct lci_data {
     struct lci_data *next; 
 } lci_data;
 
-enum ini_states {Start, BgnSp, CommEndW, SectEndW, SectEndD, EqW1, EqW2, ValPSP, ValW, ValFSP, DqmW, Bslsh, Error, Stop };
+
 
 struct lci_data *iniReadOut(const char *filename);
-int64_t getFileMaxLineLen(FILE *tfd);
+//int64_t getFileMaxLineLen(FILE *tfd);
 char *strResize(char *ptr, size_t oldsize, size_t newsize);
 lci_data *destroyNodes( lci_data *head); 
+lci_data *createNode( lci_data *head, int64_t lineLen );
+int64_t getFileMaxLineLen(FILE *tfd);
+
+
+#if defined(ini_read_c) || defined(ini_write_c)
+enum ini_states {Start, BgnSp, CommEndW, SectEndW, SectEndD, EqW1, EqW2, ValPSP, ValW, ValFSP, DqmW, Bslsh, Error, Stop };
+size_t strNullLen(const char *str);
+struct lci_data *iniFSM(struct lci_data *data, const char *in, int64_t len);
+char eescape(char c);
+
+#ifdef ini_read_c
+char unescape(char c);
+#endif // ini_read_c
+#ifdef ini_write_c
+//static const char* komment = ";#";
+#endif //ini_write_c
+#endif // ini_read_c, ini_write_c
 
 
 
