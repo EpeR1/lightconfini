@@ -20,6 +20,7 @@ typedef struct lci_data {
     char *value;
     int64_t  valueLen;
     int64_t  valueStartPos;
+    enum valueDraw {EMPTYVAL, SIMPLEVAL, MULTILINEVAL, DQUOTEDVAL} valueDraw;
     char *comment;
     int64_t  commentLen;
     int64_t  commentStartPos;
