@@ -1,4 +1,4 @@
-
+ 
 # Lightweight INI style Configuration manager  
 
 ## Supports (currently)

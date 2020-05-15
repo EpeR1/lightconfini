@@ -7,7 +7,7 @@
 #include "ini_rw.h"
 #define main_c  
 
- 
+  
   
 int main(int argc, char* argv[]){
 
@@ -19,7 +19,8 @@ int main(int argc, char* argv[]){
 
     if(argc > 1){
         memset(filename, 0, 4096);
-        snprintf(filename, 4096, "%s", argv[1]);
+        /* snprintf(filename, 4096, "%s", argv[1]); */
+        sprintf(filename, "%s", argv[1]);
     }
 
 
@@ -27,18 +28,18 @@ int main(int argc, char* argv[]){
     len = getFileMaxLineLen(fp)+1;
     if(fp != NULL) { fclose(fp);}
 
-    len = 24000;    //Debug
+    /* len = 24000; */    /*Debug*/
     lens=16;
     lenp=16;
     lenv=16;
     lenc=44;
 
 
-    buff1 = calloc((len+3), sizeof(char));
-    buff2 = calloc((len+3), sizeof(char));
-    buff3 = calloc((len+3), sizeof(char));
-    buff4 = calloc((len+3), sizeof(char));
-    buff5 = calloc((elen+3),sizeof(char));
+    buff1 = calloc((len+100), sizeof(char));
+    buff2 = calloc((len+100), sizeof(char));
+    buff3 = calloc((len+100), sizeof(char));
+    buff4 = calloc((len+100), sizeof(char));
+    buff5 = calloc((elen+100),sizeof(char));
 
 
     printf("\nLineMax: %d\n\n",len); 
@@ -49,14 +50,21 @@ int main(int argc, char* argv[]){
     tmp = ini;
     while(tmp != NULL){
 
-        snprintf(buff1, len+3, "'%s' %3ld",tmp->section, tmp->sectionLen);
+        
+    /*    snprintf(buff1, len+3, "'%s' %3ld",tmp->section, tmp->sectionLen);
         snprintf(buff2, len+3, "'%s' %3ld",tmp->param, tmp->paramLen);
         snprintf(buff3, len+3, "'%s' %3ld",tmp->value, tmp->valueLen);
         snprintf(buff4, len+3, "'%s' %3ld",tmp->comment, tmp->commentLen);
-        snprintf(buff5, elen+3,  "'%s' %3ld",tmp->errorMsg, tmp->errorMsgLen);
+        snprintf(buff5, elen+3,  "'%s' %3ld",tmp->errorMsg, tmp->errorMsgLen); */
+
+        sprintf(buff1, "'%s' %3d",tmp->section, tmp->sectionLen);
+        sprintf(buff2, "'%s' %3d",tmp->param, tmp->paramLen);
+        sprintf(buff3, "'%s' %3d",tmp->value, tmp->valueLen);
+        sprintf(buff4, "'%s' %3d",tmp->comment, tmp->commentLen);
+        sprintf(buff5, "'%s' %3d",tmp->errorMsg, tmp->errorMsgLen);
 
 
-        printf("LN: %ld,\tLL: %ld,\tSE: %*s,%2ld P: %*s,%2ld V: %*s,%2ld C: %*s,%2ld ER: %*s \n", tmp->lineNum, tmp->lineLen, lens, buff1,tmp->sectionStartPos,
+        printf("LN: %d,\tLL: %d,\tSC: %*s,%2d P: %*s,%2d V: %*s,%2d C: %*s,%2d ER: %*s \n", tmp->lineNum, tmp->lineLen, lens, buff1,tmp->sectionStartPos,
             lenp, buff2, tmp->paramStartPos, lenv, buff3, tmp->valueStartPos, lenc, buff4, tmp->commentStartPos, elen, buff5);
 
         tmp=tmp->next;

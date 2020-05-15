@@ -1,0 +1,8 @@
+./bin/lightconfini  tests/bom.ini
+
+LineMax: 32
+
+LN: 1,	LL: 27,	SC: 'bom_section'  12, 3 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                     'OK'   3,23 ER:                                           '(null)'   0 
+LN: 2,	LL: 24,	SC: 'bom_section'  12,-1 P:   'bom_name'   9, 0 V:  'bom_value'  10, 9 C:                                     'OK'   3,20 ER:                                           '(null)'   0 
+LN: 3,	LL: 31,	SC: 'bom_section'  12,-1 P:        'key'  32, 0 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER: 'Illegal character at PARAMETER! (line: 3, pos: 4)'  50 
+LN: 4,	LL: 24,	SC: 'bom_section'  12,-1 P:        'key'   4, 0 V:      'value'   6, 4 C:                                     'OK'   3,20 ER:                                           '(null)'   0 

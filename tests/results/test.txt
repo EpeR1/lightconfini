@@ -1,0 +1,69 @@
+./bin/lightconfini  tests/test.ini
+
+LineMax: 136
+
+LN: 3,	LL: 38,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:   'Comments are started with '#' or ';''  37, 0 ER:                                           '(null)'   0 
+LN: 4,	LL: 31,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:          ' Inline comments are allowed.'  30, 0 ER:                                           '(null)'   0 
+LN: 5,	LL: 39,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:  ' EMPTY/BLANK lines are not processed!'  38, 0 ER:                                           '(null)'   0 
+LN: 7,	LL: 30,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:           'Global variables are allowed'  29, 0 ER:                                           '(null)'   0 
+LN: 8,	LL: 51,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' Parameters without section are global variables.'  50, 0 ER:                                           '(null)'   0 
+LN: 9,	LL: 13,	SC:     '(null)'   0,-1 P:    'global1'   8, 0 V:         '11'   3,10 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 10,	LL: 14,	SC:     '(null)'   0,-1 P:    'global2'   8, 0 V:        'aaa'   4,10 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 12,	LL: 68,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' The First character of Section name should be alphanumerical, but'  67, 0 ER:                                           '(null)'   0 
+LN: 13,	LL: 90,	SC:     '(null)'   0,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: '  another caharacters can be Alphanumerical or dot(.)/underscore(_)/hyphen(-)/space(' ')'  89, 0 ER:                                           '(null)'   0 
+LN: 14,	LL: 40,	SC: 'Sections.are_ASCII-alnum characters'  36, 0 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 16,	LL: 29,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:            'Parameter values in itself:'  28, 0 ER:                                           '(null)'   0 
+LN: 17,	LL: 73,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: '  can be ASCII Alphanumerical only, without any SPACE or TAB character.'  72, 0 ER:                                           '(null)'   0 
+LN: 18,	LL: 67,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' Should start with alphanumerical, and from the second character,'  66, 0 ER:                                           '(null)'   0 
+LN: 19,	LL: 59,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: '  can contain (with dot(.) or underscore(_) or hyphen(-))'  58, 0 ER:                                           '(null)'   0 
+LN: 20,	LL: 106,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' If you want to use other characters, you should enclose them between two double-quotation-mark(") sign.' 105, 0 ER:                                           '(null)'   0 
+LN: 21,	LL: 44,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:  'parameter'  10, 0 V: 'value-in_itself-are-Alnum.ascii'  32,12 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 23,	LL: 135,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: 'Parameter names are ASCII alphanumerical only, with additional dot(.) or underscore(_) or hyphen(-) or suare-bracket([/]) characters.' 134, 0 ER:                                           '(null)'   0 
+LN: 24,	LL: 47,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' Square-brackets([/]) are allowed for arrays.'  46, 0 ER:                                           '(null)'   0 
+LN: 25,	LL: 35,	SC: 'Sections.are_ASCII-alnum characters'  36,-1 P: 'parameter_names.also-ASCII'  27, 0 V:      'value'   6,29 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 27,	LL: 12,	SC:  'Section 2'  10, 0 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 28,	LL: 29,	SC:  'Section 2'  10,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:            'For other value characters:'  28, 0 ER:                                           '(null)'   0 
+LN: 29,	LL: 103,	SC:  'Section 2'  10,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' The Space, or any other special characters are allowed only between two double-quotation-mark sign. ' 102, 0 ER:                                           '(null)'   0 
+LN: 30,	LL: 115,	SC:  'Section 2'  10,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' Escaped characters, (\n, \t, etc.) or multi-byte characters (é, €, カ, ⠋, ঘঃ, 😍) are allowed here. ' 114, 0 ER:                                           '(null)'   0 
+LN: 31,	LL: 73,	SC:  'Section 2'  10,-1 P: 'parameter2'  11, 0 V: 'I like 	 emojis 😍 but, don't like mosquitoes カ ! :)'  57,13 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 33,	LL: 45,	SC:  'Section 2'  10,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: ' Even! Multiline Parameters are supported: '  44, 0 ER:                                           '(null)'   0 
+LN: 36,	LL: 45,	SC:  'Section 2'  10,-1 P: 'parameter3'  11, 0 V: 'With double quotation mark 
+I can write multiline values, but I should 
+escapse the trailing newline with '' sign!' 115,13 C:                                 '(null)'   0,-1 ER:                                           '(null)'   0 
+LN: 41,	LL: 43,	SC: 'E X A M P L E S'  16, 0 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                'comment             #OK'  24,18 ER:                                           '(null)'   0 
+LN: 43,	LL: 46,	SC: 'E X A M P L E S'  16,-1 P:   'abcdefgh'   9, 0 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER: 'Illegal character at PARAMETER! (line: 43, pos: 40)'  52 
+LN: 44,	LL: 48,	SC: 'E X A M P L E S'  16,-1 P:   'abcdefgh'   9, 0 V:     '(null)'   0,-1 C:                                'CORRECT'   8,39 ER:                                           '(null)'   0 
+LN: 45,	LL: 46,	SC: 'E X A M P L E S'  16,-1 P:   'abcdefgh'   9, 0 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:  'Illegal character at VALUE! (line: 45, pos: 11)'  48 
+LN: 46,	LL: 48,	SC: 'E X A M P L E S'  16,-1 P:   'abcdefgh'   9, 0 V:         '=='   3,11 C:                                'CORRECT'   8,39 ER:                                           '(null)'   0 
+LN: 47,	LL: 46,	SC: 'E X A M P L E S'  16,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:            'Illegal character! (line: 47, pos: 1)'  38 
+LN: 48,	LL: 46,	SC: 'E X A M P L E S'  16,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:            'Illegal character! (line: 48, pos: 1)'  38 
+LN: 50,	LL: 41,	SC: 'E X A M P L E S'  16,-1 P:      'param'   6, 0 V:      'value'   6, 6 C:           'inline_comment 	         #OK'  29,11 ER:                                           '(null)'   0 
+LN: 51,	LL: 43,	SC: 'E X A M P L E S'  16,-1 P:      'param'   6, 3 V:      'value'   6,19 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 52,	LL: 46,	SC: 'E X A M P L E S'  16,-1 P:      'param'   6, 0 V:     'value1'   7, 8 C:                                 '(null)'   0,-1 ER:  'Illegal character at VALUE! (line: 52, pos: 16)'  48 
+LN: 53,	LL: 46,	SC: 'E X A M P L E S'  16,-1 P:      'param'   6, 0 V:     'value1' 136, 8 C:                                 '(null)'   0,-1 ER:  'Illegal character at VALUE! (line: 53, pos: 15)'  48 
+LN: 54,	LL: 55,	SC: 'E X A M P L E S'  16,-1 P:      'param' 136, 0 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER: 'Illegal character at PARAMETER! (line: 54, pos: 6)'  51 
+LN: 56,	LL: 46,	SC:   'example '   9, 1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER: 'Illegal character or EMPTY SECTION! (line: 56, pos: 11)'  56 
+LN: 57,	LL: 46,	SC:   'example '   9, 0 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER: 'Illegal character or EMPTY SECTION! (line: 57, pos: 10)'  56 
+LN: 59,	LL: 48,	SC:   'example '   9,-1 P:      'param'   6, 1 V: 'qwerty "qwerty" abcdefh '  25, 9 C:                                'CORRECT'   8,39 ER:                                           '(null)'   0 
+LN: 60,	LL: 46,	SC:   'example '   9,-1 P:      'param'   6, 1 V:     'qwerty'   7, 9 C:                                 '(null)'   0,-1 ER:  'Illegal character at VALUE! (line: 60, pos: 18)'  48 
+LN: 61,	LL: 43,	SC:   'example '   9,-1 P:      'param'   6, 1 V:     'qwerty'   7, 9 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 63,	LL: 43,	SC:   'example '   9,-1 P: 'array[0123]'  12, 1 V:     'asdasd'   7,15 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 64,	LL: 46,	SC:   'example '   9,-1 P:      'array'   6, 1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER: 'Illegal character at PARAMETER! (line: 64, pos: 8)'  51 
+LN: 65,	LL: 43,	SC:   'example '   9,-1 P:   'array[_]'   9, 1 V:     'jkljkl'   7,15 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 66,	LL: 43,	SC:   'example '   9,-1 P: 'array[abc]'  11, 1 V:       'aaaa'   5,14 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 67,	LL: 43,	SC:   'example '   9,-1 P:  'array.abc'  10, 1 V:       'aaaa'   5,14 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 68,	LL: 46,	SC:   'example '   9,-1 P: 'array[abc]'  11, 1 V:     '(null)'   0,14 C:                                     'OK'   3,42 ER:                                           '(null)'   0 
+LN: 70,	LL: 46,	SC:   'example '   9,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C: '### qwerty $€ß qwerty  ####           ;OK'  45, 0 ER:                                           '(null)'   0 
+LN: 72,	LL: 43,	SC:   'example '   9,-1 P:       'test'   5, 0 V:       '-1.1'   5, 9 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 73,	LL: 43,	SC:   'example '   9,-1 P:      'test2'   6, 0 V:       '-1.1'   5, 8 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 74,	LL: 46,	SC:   'example '   9,-1 P:      'test3'   6, 0 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:   'Illegal character at VALUE! (line: 74, pos: 9)'  47 
+LN: 75,	LL: 43,	SC:   'example '   9,-1 P:      'test4'   6, 0 V:       'aaa_'   5, 8 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 76,	LL: 46,	SC:   'example '   9,-1 P:      'test5'   6, 0 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:   'Illegal character at VALUE! (line: 76, pos: 9)'  47 
+LN: 77,	LL: 43,	SC:   'example '   9,-1 P:      'test6'   6, 0 V:       'aaa.'   5, 8 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 78,	LL: 43,	SC:   'example '   9,-1 P:      'test6'   6, 0 V:       'aa.a'   5, 8 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 81,	LL: 43,	SC: 'server_options'  15, 0 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 82,	LL: 43,	SC: 'server_options'  15,-1 P:    'server_'   8, 0 V:     '(null)'   0,-1 C:        'xxxx                        ;OK'  32,10 ER:                                           '(null)'   0 
+LN: 83,	LL: 43,	SC: 'server_options'  15,-1 P:    'server_'   8, 0 V: 'server.example.com'  19,10 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 84,	LL: 46,	SC: 'server_options'  15,-1 P:     '(null)'   0,-1 V:     '(null)'   0,-1 C:                                 '(null)'   0,-1 ER:            'Illegal character! (line: 84, pos: 1)'  38 
+LN: 85,	LL: 43,	SC: 'server_options'  15,-1 P:         'ip'   3, 0 V:  '127.0.0.1'  10, 7 C:                                     'OK'   3,39 ER:                                           '(null)'   0 
+LN: 86,	LL: 43,	SC: 'server_options'  15,-1 P:         'ip'   3, 0 V:  '127.0.0.1'  10, 6 C:                                     'OK'   3,39 ER:                                           '(null)'   0 

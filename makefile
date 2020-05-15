@@ -6,7 +6,8 @@ LD = gcc
 
 # néhány apróság:
 MKD = /bin/mkdir -p
-RM =  /bin/rm 
+# A '-' jel miatt átugorja a hibát
+RM =  -/bin/rm 
 
 
 # fordíto általános flagek
@@ -29,7 +30,7 @@ all: $(PROG)
 
 
 # debug-hoz felüldefiniálva 
-debug: CFLAGS = -Wall -g -g3 -ggdb -Wpedantic -Wmissing-prototypes 
+debug: CFLAGS = -Wall -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes 
 debug: LDFLAGS = 
 debug: LDLIBS = -lefence
 # nem mindegy, hogy mellette van, vagy alatta egy sorral!
