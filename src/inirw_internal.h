@@ -33,7 +33,7 @@ typedef struct lci_data {
 
 
 
-struct lci_data *iniReadOut(const char *filename);
+struct lci_data *iniReadOut(const char *filename); 
 /* int64_t getFileMaxLineLen(FILE *tfd); */
 char *strResize(char *ptr, size_t oldsize, size_t newsize);
 lci_data *destroyNodes( lci_data *head); 
@@ -44,11 +44,15 @@ size_t getFileMaxLineLen(FILE *tfd);
 #if defined(ini_read_c) || defined(ini_write_c)
 enum ini_states {Start, BgnSp, CommEndW, SectEndW, SectEndD, EqW1, EqW2, ValPSP, ValW, ValFSP, DqmW, Bslsh, Error, Stop };
 size_t strNullLen(const char *str);
-struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len);
-char eescape(char c);
+struct lci_data *iniFSM(struct lci_data *data, const unsigned char *in, int32_t len);
+int eescape(int c);
+int isascalnum(int c); /* Check if input is ASCII Alpha-numeric */
+int checkspace(int c);  /* Only for ASCII characters */
+
+
 
 #ifdef ini_read_c
-char unescape(char c);
+int unescape(int c);
 #endif /* ini_read_c */
 #ifdef ini_write_c
 //static const char* komment = ";#";

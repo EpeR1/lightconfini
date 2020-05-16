@@ -1,33 +1,26 @@
-/*INI fájl olvasás */
+/* INI fájl olvasás */
 
 #include <stdio.h>
-#include <string.h> /* strncpy + strerror*/
-#include <stdlib.h> /* malloc(), atoi(), exit(EXIT_FALIURE)*/
-#include <ctype.h>  /*, isspace(), tolower() */
-#include <errno.h>       /*errno*/
+#include <string.h> /* strncpy + strerror */
+#include <stdlib.h> /* malloc(), atoi(), exit(EXIT_FALIURE) */
+#include <errno.h>  /* errno */
 #include <stdarg.h>
-#include <stdint.h> /* int64_t*/
+#include <stdint.h> /* int64_t */
 
 #define ini_read_c
-#include "ini_rw.h"
+#include "inirw_internal.h"
 
  
-/* 
-enum ini_states state = Start;
-struct lci_data fsmdata; 
-*/
-
 
 size_t strNullLen(const char *str){
     if(str == NULL){
         return 0;
     } else { 
         return strlen(str);
-    }
+    } 
 }
 
 char *strResize(char *ptr, size_t oldsize, size_t newsize){
-    /*return ptr;*/
     char *tmp;
 
     if(newsize <= 0){           /* deleting */
@@ -60,7 +53,7 @@ char *strResize(char *ptr, size_t oldsize, size_t newsize){
     }
 }
 
-char unescape(char c){
+int unescape(int c){
     if(c == 'n'){            /* Newline */
         return '\n';
     } else if(c == 'a'){     /* Bell */
@@ -84,7 +77,7 @@ char unescape(char c){
     }
 }
 
-char eescape(char c){
+int eescape(int c){
     if(c == '\n'){          /* Newline */
         return 'n';
     } else if(c == '\a'){   /* Bell */
@@ -109,6 +102,41 @@ char eescape(char c){
         return c;  
     }
 }
+
+
+int isascalnum(int c){ /* Check if input is ASCII Alpha-numeric */
+
+    if( 0x30 <= c && c <= 0x39){    /* Numeric */
+        return 1;
+    } else if (0x41 <= c && c <= 0x5a){ /* UPPER */
+        return 1;
+    } else if( 0x61 <= c && c <= 0x7a){ /* lower */
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int checkspace(int c){  /* Only for ASCII characters */
+
+    switch (c) {
+    case 0x20:      /* space (SPC) */
+        return 1;
+    case 0x09:      /* horizontal tab (TAB) */
+        return 1;
+    case 0x0A:      /* newline (LF) */
+        return 1;
+    case 0x0B:      /* vertical tab (VT) */
+        return 1;
+    case 0x0C:      /* feed (FF) */
+        return 1;
+    case 0x0d:      /* carrige return (CR) */
+        return 1;
+    default:
+        return 0;
+    }
+}
+
 
 
 size_t getFileMaxLineLen(FILE *tfd){
@@ -136,18 +164,18 @@ size_t getFileMaxLineLen(FILE *tfd){
     }       
 }
 
-struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
+struct lci_data *iniFSM(struct lci_data *data, const unsigned char *in, int32_t len){
 
     int32_t i,j, vallen=len; 
     enum ini_states pstate=Start, state=Start;
-     char cc; 
+    /*char cc; */
 
     if(data == NULL){
         return NULL;
     } else {
 
         for(i=0, j=0; i<len; i++, j++){
-            cc = in[i]; 
+            /*cc = in[i]; */ /*debug*/
 
             switch (state) { 
                 case Start: 
@@ -165,7 +193,7 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         i--;
                     }else if(in[i] == 0xEF || in[i] == 0xBB || in[i] == 0xBF || in[i] == 0xFF || in[i] == 0x00 ){ /* UTF8, UTF16, UTF32 BOM */
                         state = Start;
-                    } else if(isspace(in[i])){                  /* ISSPACE, but not line end */
+                    } else if(checkspace(in[i])){                  /* ISSPACE, but not line end */
                         state = BgnSp;
                     } else if(in[i] == ';' || in[i] == '#' ){   /* Comment sign first */
                         j = -1;
@@ -181,7 +209,7 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         data->section = strResize(data->section, data->sectionLen, len);
                         memset(data->section, 0, len);
                         data->sectionStartPos = i;              /* Brackets [] are counted! */
-                    } else if(isalnum(in[i]) ){                 /* Parameter is starting */
+                    } else if(isascalnum(in[i]) ){                 /* Parameter is starting */
                         j = -1;
                         state = EqW1;    
                         data->param = strResize(data->param, data->paramLen, len);
@@ -216,14 +244,14 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         data->section = strResize(data->section, data->sectionLen, len);
                         memset(data->section, 0, len);
                         data->sectionStartPos = i;
-                    } else if (isalnum(in[i])){                 /* Parameter will be */
+                    } else if (isascalnum(in[i])){                 /* Parameter will be */
                         j = -1;
                         state = EqW1;
                         data->param = strResize(data->param, data->paramLen, len);
                         memset(data->param, 0, len);
                         data->paramStartPos = i;
                         i--;
-                    } else if(isspace(in[i]) /*|| in[i] == '\0' */ ){
+                    } else if(checkspace(in[i]) /*|| in[i] == '\0' */ ){
                         state = BgnSp;
                     } else {
                         state = Error;
@@ -255,7 +283,7 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         if(j == 0){         /* empty section */
                             state = Error;
                         }
-                    } else if(isalnum(in[i]) || in[i]=='/' || in[i]==' ' || in[i]=='_' || in[i]=='-' || in[i]=='.'){   
+                    } else if(isascalnum(in[i]) || in[i]=='/' || in[i]==' ' || in[i]=='_' || in[i]=='-' || in[i]=='.'){   
                         data->section[j] = in[i];
                     } else /*if((in[i] >= 0x00 && in[i] < 0x20) || in[i] == ';' || in[i] == '#' )*/ {       /* túl korai sorvég, SP(), vagy komment */
                         state = Error;
@@ -274,7 +302,7 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         state = Stop;
                         data->nodeState = lci_READY;
                         i--;
-                    }else if(isspace(in[i])){
+                    }else if(checkspace(in[i])){
                         state = SectEndD;             /* remain here */
                     } else if (in[i] == ';' || in[i] == '#'){
                         j = -1;
@@ -297,9 +325,9 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         state = ValPSP;
                         data->param[j] = '\0';
                         data->paramLen = j + 1;
-                    } else if(isalnum(in[i]) || in[i]=='[' || in[i]==']' || in[i]=='_' || in[i]=='-' || in[i]=='.'){   /* Arrays are supported ins parameter name, like in PHP */
+                    } else if(isascalnum(in[i]) || in[i]=='[' || in[i]==']' || in[i]=='_' || in[i]=='-' || in[i]=='.'){   /* Arrays are supported ins parameter name, like in PHP */
                         data->param[j] = in[i];
-                    } else if(isspace(in[i]) && in[i] != '\r' && in[i] != '\n'){   /* Only SPACE allowed between Param_name and EQ_sign */
+                    } else if(checkspace(in[i]) && in[i] != '\r' && in[i] != '\n'){   /* Only SPACE allowed between Param_name and EQ_sign */
                         state = EqW2;
                         data->param[j] = '\0';
                         data->paramLen = j + 1;
@@ -315,7 +343,7 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                     if(in[i] == '='){    /* EQ_sign arrived */
                         j = -1;
                         state = ValPSP;
-                    } else if(isspace(in[i])){   /* Another space, remain here */
+                    } else if(checkspace(in[i])){   /* Another space, remain here */
                         state = EqW2;
                     } else {
                         state = Error;
@@ -349,9 +377,9 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         data->valueStartPos = i;
                         data->nodeState = lci_CONTINUE;
                         data->valueDraw = lci_DQUOTEDVAL;
-                    } else if(isspace(in[i])){                      /* Another SP(), remain here */
+                    } else if(checkspace(in[i])){                      /* Another SP(), remain here */
                         state = ValPSP;              
-                    } else if(isalnum(in[i]) || in[i]=='-') {       /* Normal_Value collector */
+                    } else if(isascalnum(in[i]) || in[i]=='-') {       /* Normal_Value collector */
                         j = -1;
                         state = ValW;
                         data->value = strResize(data->value, data->valueLen, len);
@@ -389,9 +417,9 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                     /* } else if( in[i] == '\\' ){  // Backslash support 
                     //    j--;            //A '\' nem számít bele!
                     //    state = Bslsh;   */
-                    } else if(  isalnum(in[i]) || in[i]=='_' || in[i]=='-' || in[i]=='.' ){ /* Regular characters without SP() */
+                    } else if(isascalnum(in[i]) || in[i]=='_' || in[i]=='-' || in[i]=='.' ){ /* Regular characters without SP() */
                         data->value[j] = in[i];
-                    } else if(isspace(in[i])){            /* SPACE arrived -> line_end */
+                    } else if(checkspace(in[i])){            /* SPACE arrived -> line_end */
                         data->value[j] = '\0';
                         data->valueLen = j+1;
                         data->nodeState = lci_READY;
@@ -444,7 +472,7 @@ struct lci_data *iniFSM(struct lci_data *data, const int *in, int32_t len){
                         data->commentStartPos = i;
                         data->commentSign = in[i];
                         data->nodeState = lci_CONTINUE;
-                    } else if(isspace(in[i])){
+                    } else if(checkspace(in[i])){
                         state = ValFSP;         /* SP() -> ermain here */ 
                     } else {
                         state = Error;
@@ -597,10 +625,11 @@ lci_data *destroyNodes( lci_data *head){ /* Destroys Nodes from HEAD to the end 
 
 struct lci_data *iniReadOut(const char *filename){
 
-    int  c=0, *buff; 
+    int  c=0; 
+    unsigned char *buff; 
     FILE *fp=NULL;
     int64_t linemax, line=0, pos=0;
-    char cc;
+    /*char cc;*/
     struct lci_data *prev=NULL, *curr=NULL, *list = NULL;
 
     fp = fopen(filename, "rb"); 
@@ -612,12 +641,12 @@ struct lci_data *iniReadOut(const char *filename){
     
     } else {
         linemax = getFileMaxLineLen(fp) +1; 
-        buff = (int *) malloc(linemax*sizeof(int));
+        buff = (unsigned char *) malloc(linemax*sizeof(char));
         memset(buff, 0, linemax);
 
         while( c != EOF){
             c = fgetc(fp);
-            cc = c;
+            /*cc = c;*/     /* debug */
 
             if( c == '\n' || c == EOF){   
                 line++;

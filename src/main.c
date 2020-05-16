@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <stdbool.h>   
 
-#include "ini_rw.h"
+#include "inirw_internal.h"
 #define main_c  
 
   
