@@ -4,17 +4,28 @@
 #include <ctype.h>
 #include <stdbool.h>   
 
-#include "inirw_internal.h"
+/* #include "inirw_internal.h" */ 
+#include "lightconfini.h"
 #define main_c  
 
-  
+
+int lens=16, lenp=16, lenv=16, lenc=24, elen=55;
+
+
+void myfunct(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ){
+    
+    printf("LN: %d,\tLL: %d,\tSC: %*s,%2d P: %*s,%2d V: %*s,%2d C: %*s,%2d ER: %*s \n", line, linelen, lens, section,sectionlen,
+            lenp, param, paramlen, lenv, value, valuelen, lenc, comment, commentlen, elen, error);
+}
+/*lcinimyReadFunc mylciniReadOutFunct=myfunct;*/
+lcinimyReadFunc mylciniReadOutFunct=NULL;
+
   
 int main(int argc, char* argv[]){
 
-
+    int len;
     char filename[4096] = "tests/test.ini", *buff1, *buff2, *buff3, *buff4, *buff5;
-    lci_data *ini=NULL, *tmp=NULL;
-    int len=0, elen=54, lens=0, lenp=0, lenv=0, lenc=0; 
+    lcini_data *ini=NULL, *tmp=NULL;
     FILE *fp;
 
     if(argc > 1){
@@ -22,18 +33,11 @@ int main(int argc, char* argv[]){
         /* snprintf(filename, 4096, "%s", argv[1]); */
         sprintf(filename, "%s", argv[1]);
     }
-
-
     fp = fopen(filename, "rb");
-    len = getFileMaxLineLen(fp)+1;
+    len = lciniFileMaxLineLen(fp)+1;
     if(fp != NULL) { fclose(fp);}
 
     /* len = 24000; */    /*Debug*/
-    lens=16;
-    lenp=16;
-    lenv=16;
-    lenc=44;
-
 
     buff1 = calloc((len+100), sizeof(char));
     buff2 = calloc((len+100), sizeof(char));
@@ -44,13 +48,9 @@ int main(int argc, char* argv[]){
 
     printf("\nLineMax: %d\n\n",len); 
 
-    ini = iniReadOut(filename);
-
-
+    ini = lciniReadOut(filename);
     tmp = ini;
     while(tmp != NULL){
-
-        
     /*    snprintf(buff1, len+3, "'%s' %3ld",tmp->section, tmp->sectionLen);
         snprintf(buff2, len+3, "'%s' %3ld",tmp->param, tmp->paramLen);
         snprintf(buff3, len+3, "'%s' %3ld",tmp->value, tmp->valueLen);
@@ -69,14 +69,19 @@ int main(int argc, char* argv[]){
 
         tmp=tmp->next;
     }
-
     free(buff1);
     free(buff2);
     free(buff3);
     free(buff4);
     free(buff5);     
+    lciniDestroyNodes( ini);
 
-    destroyNodes( ini);
+
+
+
+
+    lciniReadOutOwn(filename);
+
 
 
     return 0;

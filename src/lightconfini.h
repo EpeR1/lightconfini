@@ -1,12 +1,8 @@
-#ifndef INI_READ_H_INCLUDED
-#define INI_READ_H_INCLUDED
+#ifndef LIGHTCONFINI_H_INCLUDED
+#define LIGHTCONFINI_H_INCLUDED
 #include <stdint.h> /* int64_t*/
-#include "lightconfini.h"
  
- 
-/*
 typedef struct lcini_data {
-
     enum nodeState {lcini_EMPTY, lcini_READY, lcini_CONTINUE, lcini_MULTILINE, lcini_ERROR } nodeState;
     int32_t  lineNum;
     int32_t  lineLen;
@@ -30,37 +26,34 @@ typedef struct lcini_data {
 
     struct lcini_data *next; 
 } lcini_data;
-*/
-
-/*
-struct lcini_data *iniReadOut(const char *filename); 
-char *strResize(char *ptr, size_t oldsize, size_t newsize);
-lcini_data *destroyNodes( lcini_data *head); 
-lcini_data *createNode( lcini_data *head, int64_t lineLen );
-size_t getFileMaxLineLen(FILE *tfd);
-*/
-
-#if defined(ini_read_c) || defined(ini_write_c)
-enum ini_states {Start, BgnSp, CommEndW, SectEndW, SectEndD, EqW1, EqW2, ValPSP, ValW, ValFSP, DqmW, Bslsh, Error, Stop };
-size_t strNullLen(const char *str);
-struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len);
-int eescape(int c);
-int isascalnum(int c); /* Check if input is ASCII Alpha-numeric */
-int checkspace(int c);  /* Only for ASCII characters */
 
 
+typedef struct lcini_retdata{
+    char *value;
+    int32_t vallen;
+    char *error;
+    int32_t errorlen;
+} lcini_retdata;
 
-#ifdef ini_read_c
-int unescape(int c);
-#endif /* ini_read_c */
-#ifdef ini_write_c
-//static const char* komment = ";#";
-#endif /*ini_write_c*/
-#endif /* ini_read_c, ini_write_c*/
+/* Ha maga függvény van átpakolva, nevestül, testestül */
+/* extern void (mylciniReadOutFunct)(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ) ; */
+/* Ha csak egy fggvényre mutató ptr */
+typedef void (*lcinimyReadFunc)(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ) ; 
+extern lcinimyReadFunc mylciniReadOutFunct;
 
 
-/*
+struct lcini_data *lciniReadOut(const char *filename); 
+int lciniReadOutOwn(const char *filename);
+
+char *lciniGet(const char *filename, const char *section, const char *parameter, int32_t bufflen);
+lcini_retdata *lciniGet2(const char *filename, const char *section, const char *parameter);
+
+
+
+
+ 
 char     *lciGETtoStr( const char *section, const char *param, char *dest, size_t dstlen );
+/*int      lciGETtoStrlen(const char *section, const char *param, ...); */
 int8_t     lciGETtoInt8( const char *filename, const char *section, const char *param);
 int16_t    lciGETtoInt16(const char *filename, const char *section, const char *param);
 int32_t    lciGETtoInt32(const char *filename, const char *section, const char *param);
@@ -69,9 +62,11 @@ int64_t    lciGETtoInt64(const char *filename, const char *section, const char *
 double   lciGETtoDlb(const char *filename, const char *section, const char *param);
 float    lciGETtoFlt(const char *filename, const char *section, const char *param);
 long int lciGETtoLng(const char *filename, const char *section, const char *param);
-*/
 
+char *lciniStrResize(char *ptr, size_t oldsize, size_t newsize);
+lcini_data *lciniDestroyNodes( lcini_data *head); 
+lcini_data *lciniCreateNode( lcini_data *head, int64_t lineLen );
+size_t lciniFileMaxLineLen(FILE *tfd); 
 
-
-#endif /* INI_READ_H_INCLUDED */
+#endif /* LIGHTCONFINI_H_INCLUDED */
 
