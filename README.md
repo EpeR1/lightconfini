@@ -124,3 +124,77 @@ ip = "127.0.0.1"                      ;OK
 
 ```
 
+
+## Engine is using a Finite State Machine
+  
+(markdown graph)  
+
+```mermaid
+graph LR
+
+A[Start] -- \n,\r --> ST[Stop]
+A -- comment_sign --> C[Comment]
+A -- any_space --> SP[begin_space]
+A -- utf8_BOM --> A
+A -- square_bracket --> S[section]
+A -- alpha_num --> P[label]
+A -- other --> E[ERROR]
+
+C -- any_character --> C
+C -- \n, \r --> ST
+
+SP -- \n, \r --> ST
+SP -- comment_sign --> C
+SP -- square_bracket --> S
+SP -- alpha_num --> P
+SP -- other --> E
+
+S -- square_bracket --> SE[sect_end]
+S -- alpha_num --> S
+S -- other --> E
+
+SE -- \n, \r --> ST
+SE -- any_space --> SE
+SE -- comment_sign --> C
+SE -- other --> E
+
+P -- equal_sign --> VP[value_pre]
+P -- alpha_num --> P
+P -- any_space --> P2[label_end]
+P -- other --> E
+
+P2 -- equal_sign --> VP
+P2 -- any_space --> P2
+P2 -- other --> E
+
+VP -- \n, \r --> ST
+VP -- comment_sign --> C
+VP -- double_quotation_mark --> DQ[quoted_val]
+VP -- any_space --> VP
+VP -- alpha_num --> VC[value]
+VP -- other --> E
+
+VC -- \n, \r --> ST
+VC -- comment_sign --> C
+VC -- alpha_num --> VC
+VC -- any_space --> VV[value_end]
+VC -- other --> E
+
+BS -- prev==quoted_val --> DQ
+
+VV -- \n \r --> ST
+VV -- comment_sign --> C
+VV -- any_space --> VV
+VV -- other --> E
+
+DQ -- double_quotation_mark --> VV
+DQ -- backslash --> BS
+DQ -- \r \n \0 --> E
+DQ -- any_other --> DQ
+
+E -- any_other --> ST
+
+ST -- \n \r \0 prev==ERROR --> ST
+ST -- other --> E
+
+```
