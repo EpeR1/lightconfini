@@ -38,7 +38,7 @@ typedef struct lcini_retdata{
 /* Ha maga függvény van átpakolva, nevestül, testestül */
 /* extern void (mylciniReadOutFunct)(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ) ; */
 /* Ha csak egy fggvényre mutató ptr */
-typedef void (*lcinimyReadFunc)(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ) ; 
+typedef void (*lcinimyReadFunc)(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ); 
 extern lcinimyReadFunc mylciniReadOutFunct;
 
 

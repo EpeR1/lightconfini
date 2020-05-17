@@ -11,10 +11,6 @@
 #include "inirw_internal.h"
 #include "lightconfini.h"
 
- 
-/*
-extern void (mylciniReadOutFunct)(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen );
-*/
 
 
 size_t strNullLen(const char *str){
@@ -710,22 +706,19 @@ int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a li
     char *buff=NULL; 
     FILE *fp=NULL;
     int64_t linemax, line=0, pos=0;
-    struct lcini_data curr;
+    struct lcini_data *curr;
     /* char cc;*/
 
-    curr.section = NULL;
-    curr.param = NULL;
-    curr.value = NULL;
-    curr.comment = NULL;
-    curr.errorMsg = NULL;
+    curr = lciniCreateNode(NULL,256);
     buff = (char *) malloc(256*sizeof(char));
     memset(buff, 0, 256*sizeof(char));
     fp = fopen(filename, "rb"); 
     
-    if(!fp && mylciniReadOutFunct != NULL){   /* fp == NULL */
-
-        sprintf(buff, "File opening error. Errno: %d (%s)", errno, strerror(errno) );
-        mylciniReadOutFunct(0,0, NULL,0, NULL,0, NULL,0, NULL,0, buff, 256);
+    if(!fp){   /* fp == NULL */
+        if( mylciniReadOutFunct != NULL){
+            sprintf(buff, "File opening error. Errno: %d (%s)", errno, strerror(errno) );
+            (*mylciniReadOutFunct)(0,0, NULL,0, NULL,0, NULL,0, NULL,0, buff, 256);
+        }
     
     } else {
         linemax = lciniFileMaxLineLen(fp) +1; 
@@ -741,13 +734,12 @@ int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a li
 
 
                 if(1){      /* Call the Finite-State-Machine processor */
-                    curr.lineNum = line;
-                    curr.lineLen = pos + 1;
-                    iniFSM(&curr, buff, linemax);
-                }
-                if(curr.nodeState != lcini_EMPTY && mylciniReadOutFunct != NULL ){   /* Dropping empty lines */
-                        /*  mylciniReadOutFunct(line, pos+1, curr.section, curr.sectionLen, curr.param, curr.paramLen, curr.value, curr.valueLen, curr.comment, curr.commentLen, curr.errorMsg, curr.errorMsgLen);*/
-                    (*mylciniReadOutFunct)(line, pos+1, curr.section, curr.sectionLen, curr.param, curr.paramLen, curr.value, curr.valueLen, curr.comment, curr.commentLen, curr.errorMsg, curr.errorMsgLen);
+                    curr->lineNum = line;
+                    curr->lineLen = pos + 1;
+                    iniFSM(curr, buff, linemax);
+                } 
+                if(curr->nodeState != lcini_EMPTY && mylciniReadOutFunct != NULL ){   /* Call with function ptr */
+                    (*mylciniReadOutFunct)(line, pos+1, curr->section, curr->sectionLen, curr->param, curr->paramLen, curr->value, curr->valueLen, curr->comment, curr->commentLen, curr->errorMsg, curr->errorMsgLen);
                 }
     
                 pos = 0;
@@ -762,6 +754,7 @@ int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a li
     if(fp){
         fclose(fp);
     }
+    lciniDestroyNodes(curr);
     free(buff);
     return line;
 }

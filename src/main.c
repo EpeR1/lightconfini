@@ -6,10 +6,15 @@
 
 /* #include "inirw_internal.h" */ 
 #include "lightconfini.h"
+#include "main.h"
 #define main_c  
 
 
 int lens=16, lenp=16, lenv=16, lenc=24, elen=55;
+lcinimyReadFunc mylciniReadOutFunct=myfunct;
+/*lcinimyReadFunc mylciniReadOutFunct=NULL;*/
+
+
 
 
 void myfunct(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ){
@@ -17,10 +22,8 @@ void myfunct(int line, int linelen, char *section, int sectionlen, char *param, 
     printf("LN: %d,\tLL: %d,\tSC: %*s,%2d P: %*s,%2d V: %*s,%2d C: %*s,%2d ER: %*s \n", line, linelen, lens, section,sectionlen,
             lenp, param, paramlen, lenv, value, valuelen, lenc, comment, commentlen, elen, error);
 }
-/*lcinimyReadFunc mylciniReadOutFunct=myfunct;*/
-lcinimyReadFunc mylciniReadOutFunct=NULL;
 
-  
+
 int main(int argc, char* argv[]){
 
     int len;
