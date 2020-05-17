@@ -26,6 +26,8 @@ Maximum line length can be 2^(32/2)^  characters.
 - Writing support for comments.
 - Modifying one or more values/parameters/sections in ini files.
   
+---  
+
 ## sample.ini  
 
 ```ini
@@ -68,23 +70,22 @@ I can write multiline values, but I should \
 escapse the trailing newline with '\' sign!"
   
 
-[E X A M P L E S] 	;inline comments are #OK
-abcdefgh                           ;WRONG (eqal sign is needed)
-abcdefgh =                         ;CORRECT
-abcdefgh ==                        ;WRONG (one equal sign allowed)
-abcdefgh = "=="                    ;CORRECT
-=abcd                              ;ERROR
-= ;xxxx                            ;also will produce ERROR
+[E X A M P L E S]                     ;inline comments are #OK
+abcdefgh                              ;WRONG (eqal sign is needed)
+abcdefgh =                            ;CORRECT
+abcdefgh ==                           ;WRONG (one equal sign allowed)
+abcdefgh = "=="                       ;CORRECT
+=abcd                                 ;ERROR
+= ;xxxx                               ;also will produce ERROR
 
 
-param=value                        ;OK (inline comments are ok)
-   param    = value                ;OK (you can use any space between Label, equal, and value
+param=value                           ;OK (inline comments are ok)
+   param    = value                   ;OK (you can use any space between Label, equal, and value
 
-param = value1 value2              #ERROR
-param = value1\ value2             #ERROR
-paramß = value1_value2             #ERROR (ascii is needed for labels and sections)
+param = value1 value2                 #ERROR
+param = value1\ value2                #ERROR
+paramß = value1_value2                #ERROR (ascii is needed for labels and sections)
 
- 
 [example ;section]                    ;WRONG
 [example \;section]                   ;WRONG
 
@@ -120,14 +121,15 @@ ip = "127.0.0.1"                      ;OK
 1024 = xxxxx                          ;OK
 1024 = 2048                           ;OK (but only syntactically :)
 
-  
 
 ```
 
+---  
 
 ## Engine is using a Finite State Machine
   
-(markdown graph)  
+(Markdown graph)  
+(If it does not appear see: engine.html)  
 
 ```mermaid
 graph LR
