@@ -17,10 +17,12 @@ lcinimyReadFunc mylciniReadOutFunct=myfunct;
 
 
 
+
+
 void myfunct(int line, int linelen, char *section, int sectionlen, char *param, int paramlen, char *value, int valuelen, char *comment, int commentlen, char *error, int errorlen ){
     
-    printf("LN: %d,\tLL: %d,\tSC: %*s,%2d P: %*s,%2d V: %*s,%2d C: %*s,%2d ER: %*s \n", line, linelen, lens, section,sectionlen,
-            lenp, param, paramlen, lenv, value, valuelen, lenc, comment, commentlen, elen, error);
+    printf("LN: %d,\tLL: %d,\tSC: %*s,%2d P: %*s,%2d V: %*s,%2d C: %*s,%2d ER: %*s,%2d\n", line, linelen, lens, section,sectionlen,
+     lenp, param, paramlen, lenv, value, valuelen, lenc, comment, commentlen, elen, error, errorlen);
 }
 
 

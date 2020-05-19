@@ -13,32 +13,51 @@
 
 
 
-size_t strNullLen(const char *str){
+static size_t strNullLen(const uint8_t *str){
     if(str == NULL){
         return 0;
     } else { 
-        return strlen(str);
+        return strlen((const char*)str);
     } 
 }
 
-char *lciniStrResize(char *ptr, size_t oldsize, size_t newsize){
-    char *tmp;
+
+static size_t strLcpy(uint8_t *dst, size_t dstlen, const uint8_t *src, size_t srclen){  /* Safe strncpy() */
+    uint8_t *tdst=dst; 
+    const uint8_t *tsrc=src;
+    size_t i=dstlen, j=srclen;
+
+    if(dst == NULL || src == NULL || dstlen == 0){
+        return 0;
+    } else {
+        while(--i && j-- && *tsrc != '\0'){ /* [ --i => Strats from dstlen=2] [ j-- => Stops on n=srclen] */
+            *(tdst++) = *(tsrc++);  /* dst[n] = src[n]; n++; */
+        }
+        *tdst = '\0'; /* Applies from dstlen=n=1 */
+        return tdst-dst+1;   /* full buffer (incl. '\0') */
+    }
+}
+
+
+static uint8_t *lciniStrResize(uint8_t *ptr, size_t oldsize, size_t newsize){
+    uint8_t *tmp=NULL;
 
     if(newsize <= 0){           /* deleting */
         free(ptr);
         return NULL;
 
     } else if(newsize != oldsize){       /* If any changes needed */
-        tmp = (char *) malloc(newsize*sizeof(char));
-        memset(tmp, 0, newsize*sizeof(char));
+        tmp = (uint8_t *) malloc(newsize*sizeof(uint8_t));
+        memset(tmp, 0, newsize*sizeof(uint8_t));
         if(tmp == NULL){            /* String is not changed at malloc error */
             return ptr;
         } else if(ptr == NULL) {
             return tmp;
 
         } else {   
-            strncpy(tmp, ptr, newsize); /* c89 */
+            /*strncpy(tmp, ptr, newsize);*/ /* c89 */
             /*snprintf(tmp, newsize, "%s", ptr);*/ /* c99 */
+            strLcpy(tmp, newsize, ptr, oldsize);
             free(ptr);
             return tmp;
         } 
@@ -47,7 +66,8 @@ char *lciniStrResize(char *ptr, size_t oldsize, size_t newsize){
     }
 }
 
-int unescape(int c){
+
+static uint8_t unescape(uint8_t c){
     if(c == 'n'){            /* Newline */
         return '\n';
     } else if(c == 'a'){     /* Bell */
@@ -71,7 +91,8 @@ int unescape(int c){
     }
 }
 
-int eescape(int c){
+#ifdef ini_write_c
+static uint8_t eescape(uint8_t c){
     if(c == '\n'){          /* Newline */
         return 'n';
     } else if(c == '\a'){   /* Bell */
@@ -87,15 +108,14 @@ int eescape(int c){
     } else if(c == '\v'){   /* Vertical tab */
         return 'v';
     /*} else if(c < 0x20){  //debug
-        return '~';*/
+        return '~'; */
     } else {                /* Original is OK */
         return c;  
     }
 }
+#endif
 
-
-int isascalnum(int c){ /* Check if input is ASCII Alpha-numeric */
-
+static uint8_t isascalnum(uint8_t c){ /* Check if input is ASCII Alpha-numeric */
     if( 0x30 <= c && c <= 0x39){    /* Numeric */
         return 1;
     } else if (0x41 <= c && c <= 0x5a){ /* UPPER */
@@ -107,8 +127,7 @@ int isascalnum(int c){ /* Check if input is ASCII Alpha-numeric */
     }
 }
 
-int checkspace(int c){  /* Only for ASCII characters */
-
+static uint8_t checkspace(uint8_t c){  /* Only for ASCII characters */
     switch (c) {
     case 0x20:      /* space (SPC) */
         return 1;
@@ -130,10 +149,8 @@ int checkspace(int c){  /* Only for ASCII characters */
 
 
 size_t lciniFileMaxLineLen(FILE *tfd){
-
-    size_t c=0;
+    int c=0;
     size_t i=0, max=0;
-
     if (tfd != NULL){
         while( c != EOF){
             c = fgetc(tfd);
@@ -154,19 +171,17 @@ size_t lciniFileMaxLineLen(FILE *tfd){
     }       
 }
 
-struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
+static struct lcini_data *iniFSM(struct lcini_data *data, const uint8_t *in, int32_t len){
 
     int32_t i,j, vallen=len; 
-    enum ini_states pstate=Start, state=Start;
+    enum lcini_states pstate=Start, state=Start;
     /*char cc; */
-
     if(data == NULL){
         return NULL;
     } else {
 
         for(i=0, j=0; i<len; i++, j++){
             /*cc = in[i];*/  /*debug*/
-
             switch (state) { 
                 case Start: 
                     if(data->nodeState == lcini_MULTILINE){                                               /* Bypass to the DQM collection */
@@ -181,7 +196,7 @@ struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
                     } else if(in[i] == '\n' || in[i] == '\r' /*|| in[i] == '\0'*/){   /* Line End */
                         state = Stop;                   
                         i--;
-                    }else if((unsigned char)in[i] == 0xEF || (unsigned char)in[i] == 0xBB || (unsigned char)in[i] == 0xBF || (unsigned char)in[i] == 0xFF || (unsigned char)in[i] == 0x00 ){ /* UTF8, UTF16, UTF32 BOM */
+                    }else if(in[i]==0xEF || in[i]==0xBB || in[i]==0xBF || in[i]==0xFF || in[i]==0x00 ){ /* UTF8, UTF16, UTF32 BOM */
                         state = Start;
                     } else if(checkspace(in[i])){                  /* ISSPACE, but not line end */
                         state = BgnSp;
@@ -288,7 +303,7 @@ struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
 
 
                 case SectEndD:          /* Section collected, then: SP(), line_end, or comment */
-                    if(in[i] == '\n' || in[i] == '\r'){
+                    if(in[i]=='\n' || in[i]=='\r'){
                         state = Stop;
                         data->nodeState = lcini_READY;
                         i--;
@@ -404,9 +419,11 @@ struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
                         data->commentStartPos = i;
                         data->commentSign = in[i];
                         data->nodeState = lcini_CONTINUE;
-                    /* } else if( in[i] == '\\' ){  // Backslash support 
-                    //    j--;            //A '\' nem számít bele!
-                    //    state = Bslsh;   */
+                    /*
+                        } else if( in[i] == '\\' ){  // Backslash support 
+                            j--;            //A '\' nem számít bele!
+                            state = Bslsh;   
+                    */
                     } else if(isascalnum(in[i]) || in[i]=='_' || in[i]=='-' || in[i]=='.' ){ /* Regular characters without SP() */
                         data->value[j] = in[i];
                     } else if(checkspace(in[i])){            /* SPACE arrived -> line_end */
@@ -443,9 +460,9 @@ struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
                         state = Error;
                         i--;
                     }
-                    /* if(0x00 < in[i] && in[i] < 0x20){   //láthatatlan: pl \\n (escapelt sorvége)
-                    //    j--;
-                    //}     */
+                    /* if(0x00 < in[i] && in[i] < 0x20){   //láthatatlan: pl \\n (escapelt sorvége) //Vagy inkább mégis kell?
+                        j--;
+                    }     */
                     pstate = Bslsh;
                     break;
 
@@ -510,17 +527,16 @@ struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
                     data->errorMsg = lciniStrResize(data->errorMsg, data->errorMsgLen, 256);  /* Returns zero-filled string */
 
                     if(pstate == SectEndW || pstate == SectEndD){
-                        data->errorMsgLen = sprintf(data->errorMsg, "Illegal character or EMPTY SECTION! (line: %d, pos: %d)", data->lineNum, i+1) +1;
+                        data->errorMsgLen = sprintf((char*)data->errorMsg, "Illegal character or EMPTY SECTION! (line: %d, pos: %d)", data->lineNum, i+1) +1;
                     } else if(pstate == EqW1 || pstate == EqW2){
-                        data->errorMsgLen = sprintf(data->errorMsg, "Illegal character at PARAMETER! (line: %d, pos: %d)", data->lineNum, i+1) +1;
+                        data->errorMsgLen = sprintf((char*)data->errorMsg, "Illegal character at PARAMETER! (line: %d, pos: %d)", data->lineNum, i+1) +1;
                     } else if(pstate == ValPSP || pstate == ValW || pstate == ValFSP ){
-                        data->errorMsgLen = sprintf(data->errorMsg, "Illegal character at VALUE! (line: %d, pos: %d)", data->lineNum, i+1) +1;
+                        data->errorMsgLen = sprintf((char*)data->errorMsg, "Illegal character at VALUE! (line: %d, pos: %d)", data->lineNum, i+1) +1;
                     } else if(pstate == DqmW){
-                        data->errorMsgLen = sprintf(data->errorMsg, "Double quotation mark needed! (line: %d, pos: %d)", data->lineNum, i+1) +1;
+                        data->errorMsgLen = sprintf((char*)data->errorMsg, "Double quotation mark needed! (line: %d, pos: %d)", data->lineNum, i+1) +1;
                     } else {    
-                        data->errorMsgLen = sprintf(data->errorMsg, "Illegal character! (line: %d, pos: %d)", data->lineNum, i+1) +1;
+                        data->errorMsgLen = sprintf((char*)data->errorMsg, "Illegal character! (line: %d, pos: %d)", data->lineNum, i+1) +1;
                     }
-
 
                     i--;
                     state = Stop;    
@@ -564,7 +580,7 @@ struct lcini_data *iniFSM(struct lcini_data *data, const char *in, int32_t len){
 
 
 
-lcini_data *lciniCreateNode( lcini_data *head, int64_t lineLen ){ /* Creates one Node */
+lcini_data *lciniCreateNode( lcini_data *head, int lineLen ){ /* Creates one Node */
     lcini_data *curr;
 
     curr = (lcini_data *) calloc(1, sizeof(lcini_data));
@@ -573,11 +589,11 @@ lcini_data *lciniCreateNode( lcini_data *head, int64_t lineLen ){ /* Creates one
     curr->lineLen = lineLen;
 
     if(lineLen > 0){
-        curr->section  = (char *) calloc(lineLen, sizeof(char));
-        curr->param    = (char *) calloc(lineLen, sizeof(char));
-        curr->value    = (char *) calloc(lineLen, sizeof(char));
-        curr->comment  = (char *) calloc(lineLen, sizeof(char));
-        curr->errorMsg = (char *) calloc(lineLen, sizeof(char));
+        curr->section  = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
+        curr->param    = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
+        curr->value    = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
+        curr->comment  = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
+        curr->errorMsg = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
     } else {
         lineLen = 0;
     }
@@ -620,23 +636,23 @@ lcini_data *lciniDestroyNodes( lcini_data *head){ /* Destroys Nodes from HEAD to
 struct lcini_data *lciniReadOut(const char *filename){      /* Reads the entire file to a linked-list */
 
     int  c=0; 
-    char *buff; 
+    uint8_t *buff; 
     FILE *fp=NULL;
-    int64_t linemax, line=0, pos=0;
+    int32_t linemax, line=0, pos=0;
     /*char cc;*/
-    struct lcini_data *prev=NULL, *curr=NULL, *list = NULL;
+    struct lcini_data *prev=NULL, *curr=NULL, *list=NULL;
 
     fp = fopen(filename, "rb"); 
     if(!fp ){   /* fp == NULL */
         list = lciniCreateNode(NULL, 256);
         list->errorMsg = lciniStrResize(list->errorMsg, list->errorMsgLen, 256);
-        list->errorMsgLen = sprintf(list->errorMsg, "File opening error. Errno: %d (%s)", errno, strerror(errno) );
+        list->errorMsgLen = sprintf((char*)list->errorMsg, "File opening error. Errno: %d (%s)", errno, strerror(errno) );
         list->nodeState = lcini_ERROR;
     
     } else {
         linemax = lciniFileMaxLineLen(fp) +1; 
-        buff = (char *) malloc(linemax*sizeof(char));
-        memset(buff, 0, linemax*sizeof(char));
+        buff = (uint8_t*)malloc(linemax*sizeof(uint8_t));
+        memset(buff, 0, linemax*sizeof(uint8_t));
 
         while( c != EOF){
             c = fgetc(fp);
@@ -683,7 +699,7 @@ struct lcini_data *lciniReadOut(const char *filename){      /* Reads the entire 
                     /* return list; */
                 }
                 pos = 0;
-                memset(buff, 0, linemax*sizeof(char));
+                memset(buff, 0, linemax*sizeof(uint8_t));
             } else {
                 buff[pos] = c;
                 pos++;
@@ -703,21 +719,20 @@ struct lcini_data *lciniReadOut(const char *filename){      /* Reads the entire 
 int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a linked-list */
 
     int  c=0; 
-    char *buff=NULL; 
+    uint8_t *buff=NULL; 
     FILE *fp=NULL;
     int64_t linemax, line=0, pos=0;
     struct lcini_data *curr;
-    /* char cc;*/
 
     curr = lciniCreateNode(NULL,256);
-    buff = (char *) malloc(256*sizeof(char));
-    memset(buff, 0, 256*sizeof(char));
+    buff = (uint8_t*) malloc(256*sizeof(uint8_t));
+    memset(buff, 0, 256*sizeof(uint8_t));
     fp = fopen(filename, "rb"); 
     
     if(!fp){   /* fp == NULL */
         if( mylciniReadOutFunct != NULL){
-            sprintf(buff, "File opening error. Errno: %d (%s)", errno, strerror(errno) );
-            (*mylciniReadOutFunct)(0,0, NULL,0, NULL,0, NULL,0, NULL,0, buff, 256);
+            sprintf((char*)buff, "File opening error. Errno: %d (%s)", errno, strerror(errno) );
+            (*mylciniReadOutFunct)(0,0, NULL,0, NULL,0, NULL,0, NULL,0, (char*)buff, 256);
         }
     
     } else {
@@ -726,24 +741,26 @@ int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a li
 
         while( c != EOF){
             c = fgetc(fp);
-            /*cc = c;*/     /* debug */
 
             if( c == '\n' || c == EOF){   
                 line++;
                 buff[pos] = '\n';
 
-
-                if(1){      /* Call the Finite-State-Machine processor */
+                if(curr){      /* Call the Finite-State-Machine processor */
                     curr->lineNum = line;
                     curr->lineLen = pos + 1;
                     iniFSM(curr, buff, linemax);
                 } 
                 if(curr->nodeState != lcini_EMPTY && mylciniReadOutFunct != NULL ){   /* Call with function ptr */
-                    (*mylciniReadOutFunct)(line, pos+1, curr->section, curr->sectionLen, curr->param, curr->paramLen, curr->value, curr->valueLen, curr->comment, curr->commentLen, curr->errorMsg, curr->errorMsgLen);
+                    (*mylciniReadOutFunct)(line, pos+1, (char*)curr->section, curr->sectionLen, (char*)curr->param, curr->paramLen, (char*)curr->value, curr->valueLen, (char*)curr->comment, curr->commentLen, (char*)curr->errorMsg, curr->errorMsgLen);
                 }
-    
+                curr->paramLen = 0;
+                curr->valueLen = 0;
+                curr->commentLen = 0;
+                curr->errorMsgLen = 0;
+                
                 pos = 0;
-                memset(buff, 0, linemax*sizeof(char));
+                memset(buff, 0, linemax*sizeof(uint8_t));
             } else {
                 buff[pos] = c;
                 pos++;
@@ -761,3 +778,63 @@ int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a li
 
 
 
+/*
+char *lciniGetFromFileStr(const char *filename, const char *section, const char *parameter, char *buff, int len){
+
+    int  c=0; 
+    uint8_t *buff=NULL;
+    char *value=NULL; 
+    FILE *fp=NULL;
+    int64_t linemax, line=0, pos=0;
+    struct lcini_data *curr;
+
+    fp = fopen(filename, "rb"); 
+    
+    if(!fp){   
+        return NULL;
+    } else {
+        linemax = lciniFileMaxLineLen(fp) +1; 
+        curr = lciniCreateNode(NULL,linemax);
+        buff = (uint8_t *) malloc(linemax*sizeof(uint8_t));
+        memset(buff, 0, linemax*sizeof(uint8_t));
+        value = malloc(1*sizeof(char));
+
+        while( c != EOF){
+            c = fgetc(fp);
+
+            if( c == '\n' || c == EOF){   
+                line++;
+                buff[pos] = '\n';
+
+                if(curr){      
+                    curr->lineNum = line;
+                    curr->lineLen = pos + 1;
+                    iniFSM(curr, buff, linemax);
+                } 
+                if(curr->nodeState != lcini_EMPTY && value && section && param){   
+                    if(strcmp(curr->section, section) == 0  && strcmp(curr->param, param) == 0){
+                        value = lciniStrResize(value, 1, curr->valueLen);
+                    }
+                }
+                curr->paramLen = 0;
+                curr->valueLen = 0;
+                curr->commentLen = 0;
+                curr->errorMsgLen = 0;
+                
+                pos = 0;
+                memset(buff, 0, linemax*sizeof(uint8_t));
+            } else {
+                buff[pos] = c;
+                pos++;
+            }
+        }
+        lciniDestroyNodes(curr);
+        free(buff);
+    }
+
+    if(fp){
+        fclose(fp);
+    }
+    return value; 
+}
+*/
