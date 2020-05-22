@@ -29,8 +29,8 @@ typedef struct lcini_data {
 
 
 typedef struct lcini_shortret{
-    uint8_t *ret;
-    int32_t retlen;
+    char *ret;
+    int retlen;
     enum retType{lcini_shortretOK, lcini_shortretERROR, lcini_shortretEMPTY} retType;
 } lcini_shortret;
 
@@ -45,10 +45,10 @@ struct lcini_data *lciniReadOut(const char *filename);
 int lciniReadOutOwn(const char *filename);
 
 lcini_data     *lciniGet(lcini_data *head, const char *section, const char *parameter); /* FETCH requested value TO an lcini_data object, FROM lcini_data list*/ 
-char           *lciniGetStr(lcini_data *head, const char *section, const char *parameter, char *dst, int dstlen); /* FETCH requested value TO null-terminated-string, FROM lcini_data list */
+int             lciniGetStr(lcini_data *head, const char *section, const char *parameter, char *dst, int dstlen); /* FETCH requested value TO null-terminated-string, FROM lcini_data list */
 lcini_shortret *lciniGetShort(lcini_data *head, const char *section, const char *parameter);    /* FETCH requested value TO shortret object, FROM lcini_data list*/
 lcini_shortret *lciniGetFromFileShort(const char *filename, const char *section, const char *parameter); /* FETCH requested value TO shortret object FROM file */
-char           *lciniGetFromFileStr(const char *filename, const char *section, const char *parameter, char *buff, int len);
+int             lciniGetFromFileStr(const char *filename, const char *section, const char *parameter, char *buff, int len);
 
 
 
@@ -56,6 +56,9 @@ char           *lciniGetFromFileStr(const char *filename, const char *section, c
 lcini_data *lciniDestroyNodes( lcini_data *head); 
 lcini_data *lciniCreateNode( lcini_data *head, int lineLen );
 size_t lciniFileMaxLineLen(FILE *tfd); 
+
+lcini_shortret *lciniMKShortRet(int bufflen);
+void lciniDestroyShortRet(lcini_shortret *dt);
 
 #endif /* LIGHTCONFINI_H_INCLUDED */
 

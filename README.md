@@ -18,11 +18,11 @@ Uses Finite State Machine technique for file processing.
 **Sections, Parameter names** can be **ASCII** alphabetical or numerical characters.
 **Values** in alone also ASCII, or between Double-Quotation-Marks(") can be **any UNICODE/UTF8** characters.
 
-Maximum line length can be 2^(32/2)^  characters.
+Maximum line length can be 2^(32/2)  characters.
 
 ## Future Plans  
 
-- Writing and Rewriting support for ini files.
+- Writing and Rewriting ini files.
 - Writing support for comments.
 - Modifying one or more values/parameters/sections in ini files.
   
