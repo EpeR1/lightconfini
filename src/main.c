@@ -17,6 +17,9 @@ lcinimyReadFunc mylciniReadOutFunct=myfunct;
 
 
 
+char *search_sec = "bom_section";
+char *search_par = "mmm";
+
 
 
 
@@ -28,12 +31,12 @@ void myfunct(int line, int linelen, char *section, int sectionlen, char *param, 
 
 
 int main(int argc, char* argv[]){
-
+ 
     int len,r;
     char filename[4096] = "tests/test.ini", *buff1, *buff2, *buff3, *buff4, *buff5, *buff6;
     lcini_data *ini=NULL, *tmp=NULL;
     FILE *fp;
-    lcini_shortret *sret;
+    lcini_shortret *sret=NULL, *sret2=NULL;
 
     if(argc > 1){
         memset(filename, 0, 4096);
@@ -79,27 +82,30 @@ int main(int argc, char* argv[]){
         tmp=tmp->next;
     }
     
-    
+  
 
-    printf("\n\nFUNC: lciniReadOutOwn()\n\n");
+    printf("\n\nFUNC: lciniReadOutOwn():\n\n");
     lciniReadOutOwn(filename);
 
-    printf("\n\n FUNC: lciniGet()\n\n");
-    tmp = lciniGet(ini, "bom_section", "mmm");
-    printf("X->0x%x\n", tmp);
+
+
+
+    printf("\n\nFUNC: lciniGet():\n\n");
+    tmp = lciniGet(ini, search_sec, search_par);
+    printf("X->%p\n", (void *)tmp);
     if(tmp){
         printf("x->S: '%s', x->P: '%s', x->V: '%s', x->E: '%s'\n",tmp->section, tmp->param, tmp->value, tmp->errorMsg);
     }
 
 
-    printf("\n\n FUNC: lciniGetStr()\n\n");
-    r=lciniGetStr(ini, "bom_section", "mmm", buff6, 100);
+    printf("\n\nFUNC: lciniGetStr():\n\n");
+    r=lciniGetStr(ini, search_sec, search_par, buff6, 100);
     printf("r: %d, R: '%s' \n",r,buff6);
 
 
 
-    printf("\n\n FUNC: lciniGetShort()\n\n");
-    sret = lciniGetShort(ini, "bom_section", "key");
+    printf("\n\nFUNC: lciniGetShort():\n\n");
+    sret = lciniGetShort(ini, search_sec, search_par, NULL);
     printf("SR: '%s', %d, t: ",sret->ret,sret->retlen);
     if(sret->retType == lcini_shortretEMPTY){
         printf("sret_empty\n");
@@ -110,6 +116,23 @@ int main(int argc, char* argv[]){
     }
 
 
+    printf("\n\nFUNC: lciniGetFromFileShort():\n\n");
+    sret2 = lciniGetFromFileShort(filename, search_sec, search_par, NULL);
+    printf("SR: '%s', %d, t: ",sret2->ret,sret2->retlen);
+    if(sret2->retType == lcini_shortretEMPTY){
+        printf("sret_empty\n");
+    }else if(sret2->retType == lcini_shortretERROR){
+        printf("sret_err\n");
+    } else {
+        printf("sret_ok\n");
+    }
+
+    printf("\n\nFUNC: lciniGetFromFileStr():\n\n");
+    r=lciniGetFromFileStr(filename, search_sec, search_par, buff6, 100);
+    printf("r: %d, R: '%s' \n",r,buff6);
+
+
+    lciniDestroyShortRet(sret2);
     lciniDestroyShortRet(sret);
     lciniDestroyNodes(ini);
     free(buff1);

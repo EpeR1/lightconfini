@@ -3,7 +3,7 @@
 #include <stdint.h> /* int64_t*/
  
 typedef struct lcini_data {
-    enum nodeState {lcini_EMPTY, lcini_READY, lcini_CONTINUE, lcini_MULTILINE, lcini_ERROR } nodeState;
+    enum nodeState {lcini_EMPTY, lcini_READY, lcini_CONTINUE, lcini_MULTILINE, lcini_ERROR, lcini_FLERROR } nodeState;
     int32_t  lineNum;
     int32_t  lineLen;
 
@@ -27,7 +27,7 @@ typedef struct lcini_data {
     struct lcini_data *next; 
 } lcini_data;
 
-
+ 
 typedef struct lcini_shortret{
     char *ret;
     int retlen;
@@ -46,9 +46,9 @@ int lciniReadOutOwn(const char *filename);
 
 lcini_data     *lciniGet(lcini_data *head, const char *section, const char *parameter); /* FETCH requested value TO an lcini_data object, FROM lcini_data list*/ 
 int             lciniGetStr(lcini_data *head, const char *section, const char *parameter, char *dst, int dstlen); /* FETCH requested value TO null-terminated-string, FROM lcini_data list */
-lcini_shortret *lciniGetShort(lcini_data *head, const char *section, const char *parameter);    /* FETCH requested value TO shortret object, FROM lcini_data list*/
-lcini_shortret *lciniGetFromFileShort(const char *filename, const char *section, const char *parameter); /* FETCH requested value TO shortret object FROM file */
-int             lciniGetFromFileStr(const char *filename, const char *section, const char *parameter, char *buff, int len);
+lcini_shortret *lciniGetShort(lcini_data *head, const char *section, const char *parameter, lcini_shortret *ret);    /* FETCH requested value TO shortret object, FROM lcini_data list*/
+lcini_shortret *lciniGetFromFileShort(const char *filename, const char *section, const char *parameter, lcini_shortret *ret); /* FETCH requested value TO shortret object FROM file */
+int             lciniGetFromFileStr(const char *filename, const char *section, const char *parameter, char *dst, int dstlen);
 
 
 
