@@ -85,7 +85,7 @@ int main(int argc, char* argv[]){
   
 
     printf("\n\nFUNC: lciniReadOutOwn():\n\n");
-    lciniReadOutOwn(filename);
+    /* lciniReadOutOwn(filename); */
 
 
 
@@ -117,18 +117,21 @@ int main(int argc, char* argv[]){
 
 
     printf("\n\nFUNC: lciniGetFromFileShort():\n\n");
-    sret2 = lciniGetFromFileShort(filename, search_sec, search_par, NULL);
-    printf("SR: '%s', %d, t: ",sret2->ret,sret2->retlen);
-    if(sret2->retType == lcini_shortretEMPTY){
-        printf("sret_empty\n");
-    }else if(sret2->retType == lcini_shortretERROR){
-        printf("sret_err\n");
-    } else {
-        printf("sret_ok\n");
+     sret2 = lciniGetFromFileShort(filename, search_sec, search_par, NULL);
+    printf("---\n");
+    if(sret2){
+        printf("SR: '%s', %d, t: ",sret2->ret,sret2->retlen);
+        if(sret2->retType == lcini_shortretEMPTY){
+            printf("sret_empty\n");
+        }else if(sret2->retType == lcini_shortretERROR){
+            printf("sret_err\n");
+        } else {
+            printf("sret_ok\n");
+        }
     }
 
     printf("\n\nFUNC: lciniGetFromFileStr():\n\n");
-    r=lciniGetFromFileStr(filename, search_sec, search_par, buff6, 100);
+    /* r=lciniGetFromFileStr(filename, search_sec, search_par, buff6, 100); */
     printf("r: %d, R: '%s' \n",r,buff6);
 
 
@@ -141,6 +144,6 @@ int main(int argc, char* argv[]){
     free(buff4);
     free(buff5); 
     free(buff6);
-    printf("\n");
+    printf("\n -- end --\n");
     return 0;
 }

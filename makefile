@@ -1,4 +1,4 @@
-.PHONY: all clean test testlib install copylib ldconf lib debug distclean
+.PHONY: all clean main test testlib testlibd install copylib ldconf lib debug distclean
 
 # buid & link with gcc
 CC = gcc
@@ -11,12 +11,14 @@ RM =  -/bin/rm
 CP = -/bin/cp 
 
 # fordíto általános flagek
+PWD = $(shell pwd)
 LASTVER = $(shell git describe)
 LASTVERT = $(shell git describe --tags --abbrev=0)
 LASTMAINT = $(firstword $(subst ., ,$(LASTVERT)))
 CFLAGS = -Wall -c -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 LDFLAGS = 
 LDLIBS =
+PREP=
 
 # Ha libdir-be "lib"-et írunk, akkor körbeforgó fggőség lesz belőle
 BINDIR = bin
@@ -32,30 +34,35 @@ PROG =  $(BINDIR)/lightconfini
 OBJ  = $(patsubst $(SRCDIR)/%.c, %.o, $(wildcard $(SRCDIR)/*.c))
 OBJS = $(addprefix $(OBJDIR)/,$(OBJ))
 lib: OBJS = $(addprefix $(OBJDIR)/, $(filter-out main.o, $(OBJ))  )
-lib: PROG = $(LIBDIR)/liblightconfini.so.$(LASTVER)
+lib: PROG = $(LIBDIR)/liblightconfini.so.$(LASTVERT)
 # Egyik targetben beállított változó nem érvényes a másik targetben!
 
 
 # ALL kell legyen legelőször!
 # Az sem mindegy, hogy mellette van, vagy alatta egy sorral!
-all: lib
-test: $(PROG)
-lib:  $(PROG)
+all: lib 
+test: clean $(PROG)
+lib:  $(PROG) ldconf
 debug: clean $(PROG)
 install: lib copylib 
-testlib: clean lib ldconf clean
-	$(CC) $(CFLAGS) -D"TESTLIB=1" -o $(OBJDIR)/main.o $(SRCDIR)/main.c
-	$(LD) $(LDFLAGS) $(OBJDIR)/main.o -o $(PROG) $(LDLIBS)
+testlib: lib ldconf clean main
+testlibd: lib ldconf clean main
 
 # debug-hoz felüldefiniálva 
 debug: CFLAGS = -Wall -c -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 debug: LDLIBS = -lefence
 # make lib  FLAGS: not link: -c, relative addresses: -fPIC
 lib: CFLAGS = -fPIC -c -Wall -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
-lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.$(LASTMAIN)
+lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.$(LASTMAINT)
 lib: LDLIBS = -lc
 # nem mindegy, hogy mellette van, vagy alatta egy sorral!
-testlib: LDFLAGS = -ldl -rdynamic
+testlib: LDFLAGS = -L $(PWD)/$(LIBDIR)/
+testlib: LDLIBS = -llightconfini
+testlib: PREP = TESTLIB
+#Dinamikus betöltés tesztelése
+testlibd: LDFLAGS = -rdynamic
+testlibd: LDLIBS = -ldl
+testlibd: PREP = TESTLIBD
 
 
 # Ha még nem létezik az obj könyvtár, létrehozza
@@ -64,7 +71,7 @@ $(PROG): | $(BINDIR)
 $(PROG): | $(LIBDIR)
 
 # Fordított sorrend: először a főprogram
-$(PROG): $(OBJS)
+$(PROG) lnk: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $(PROG) $(LDLIBS)
 	@echo ' '
 
@@ -72,6 +79,10 @@ $(PROG): $(OBJS)
 $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c  
 	$(CC) $(CFLAGS) -o "$@" "$<"
 
+# A main újrafordítása
+main:
+	$(CC) $(CFLAGS) -D"$(PREP)" -o $(OBJDIR)/main.o $(SRCDIR)/main.c 
+	$(LD) $(LDFLAGS) $(OBJDIR)/main.o -o $(PROG) $(LDLIBS)
 
 # OBJ létrehozáshoz
 $(BINDIR):  
@@ -84,11 +95,13 @@ $(LIBDIR):
 rebuild: clean all
 
 copylib:
-	$(CP) -r $(LIBDIR)/* /usr/local/lib/
-	ldconfig 
+	$(CP) -r $(LIBDIR)/* /usr/local/lib/ 
+	ln -sf /usr/local/lib/liblightconfini.so.$(LASTVERT) /usr/local/lib/liblightconfini.so
+	ldconfig
 
 ldconf:
-	ldconfig -n $(LIBDIR)
+	ln -sf $(PWD)/$(LIBDIR)/liblightconfini.so.$(LASTVERT) $(PWD)/$(LIBDIR)/liblightconfini.so
+	ldconfig -n $(PWD)/$(LIBDIR)/
 
 clean:
 	$(RM) $(OBJS) 

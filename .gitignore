@@ -6,6 +6,7 @@ build/
 *.gch
 obj/
 bin/
+libdir/
 *ValgrindOut.xml*
 others/test.ini
 massif.*
