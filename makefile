@@ -11,9 +11,10 @@ RM =  -/bin/rm
 CP = -/bin/cp 
 
 # fordíto általános flagek
-LASTVER = $(shell git describe --tags)
-LASTMAIN = $(firstword $(subst ., ,$(LASTVER)))
-CFLAGS = -Wall -c -D"GIT_VERSION=$(LASTVER)" -D"GIT_MAINVERSION=$(LASTMAIN)"
+LASTVER = $(shell git describe)
+LASTVERT = $(shell git describe --tags --abbrev=0)
+LASTMAINT = $(firstword $(subst ., ,$(LASTVERT)))
+CFLAGS = -Wall -c -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 LDFLAGS = 
 LDLIBS =
 
@@ -42,15 +43,15 @@ test: $(PROG)
 lib:  $(PROG)
 debug: clean $(PROG)
 install: lib copylib 
-testlib: lib ldconf clean
+testlib: clean lib ldconf clean
 	$(CC) $(CFLAGS) -D"TESTLIB=1" -o $(OBJDIR)/main.o $(SRCDIR)/main.c
 	$(LD) $(LDFLAGS) $(OBJDIR)/main.o -o $(PROG) $(LDLIBS)
 
 # debug-hoz felüldefiniálva 
-debug: CFLAGS = -Wall -c -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_VERSION=$(LASTVER)" -D"GIT_MAINVERSION=$(LASTMAIN)"
+debug: CFLAGS = -Wall -c -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 debug: LDLIBS = -lefence
 # make lib  FLAGS: not link: -c, relative addresses: -fPIC
-lib: CFLAGS = -fPIC -c -Wall -D"GIT_VERSION=$(LASTVER)" -D"GIT_MAINVERSION=$(LASTMAIN)"
+lib: CFLAGS = -fPIC -c -Wall -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.$(LASTMAIN)
 lib: LDLIBS = -lc
 # nem mindegy, hogy mellette van, vagy alatta egy sorral!
