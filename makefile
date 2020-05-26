@@ -11,7 +11,9 @@ RM =  -/bin/rm
 CP = -/bin/cp 
 
 # fordíto általános flagek
-CFLAGS = -Wall -c
+LASTVER = $(shell git describe --tags)
+LASTMAIN = $(firstword $(subst ., ,$(LASTVER)))
+CFLAGS = -Wall -c -D"GIT_VERSION=$(LASTVER)" -D"GIT_MAINVERSION=$(LASTMAIN)"
 LDFLAGS = 
 LDLIBS =
 
@@ -20,6 +22,7 @@ BINDIR = bin
 LIBDIR = libdir
 OBJDIR = build
 SRCDIR = src
+#LASTVER = 2.0.0
 
 
 # .o fájlok
@@ -28,8 +31,9 @@ PROG =  $(BINDIR)/lightconfini
 OBJ  = $(patsubst $(SRCDIR)/%.c, %.o, $(wildcard $(SRCDIR)/*.c))
 OBJS = $(addprefix $(OBJDIR)/,$(OBJ))
 lib: OBJS = $(addprefix $(OBJDIR)/, $(filter-out main.o, $(OBJ))  )
-lib: PROG = $(LIBDIR)/liblightconfini.so.1.0.1
+lib: PROG = $(LIBDIR)/liblightconfini.so.$(LASTVER)
 # Egyik targetben beállított változó nem érvényes a másik targetben!
+
 
 # ALL kell legyen legelőször!
 # Az sem mindegy, hogy mellette van, vagy alatta egy sorral!
@@ -39,20 +43,18 @@ lib:  $(PROG)
 debug: clean $(PROG)
 install: lib copylib 
 testlib: lib ldconf clean
-	$(CC) $(CFLAGS) -o $(OBJDIR)/main.o $(SRCDIR)/main.c
+	$(CC) $(CFLAGS) -D"TESTLIB=1" -o $(OBJDIR)/main.o $(SRCDIR)/main.c
 	$(LD) $(LDFLAGS) $(OBJDIR)/main.o -o $(PROG) $(LDLIBS)
 
-
 # debug-hoz felüldefiniálva 
-debug: CFLAGS = -Wall -c -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes  
+debug: CFLAGS = -Wall -c -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_VERSION=$(LASTVER)" -D"GIT_MAINVERSION=$(LASTMAIN)"
 debug: LDLIBS = -lefence
 # make lib  FLAGS: not link: -c, relative addresses: -fPIC
-lib: CFLAGS = -fPIC -c -Wall 
-lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.1
+lib: CFLAGS = -fPIC -c -Wall -D"GIT_VERSION=$(LASTVER)" -D"GIT_MAINVERSION=$(LASTMAIN)"
+lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.$(LASTMAIN)
 lib: LDLIBS = -lc
 # nem mindegy, hogy mellette van, vagy alatta egy sorral!
 testlib: LDFLAGS = -ldl -rdynamic
-
 
 
 # Ha még nem létezik az obj könyvtár, létrehozza
