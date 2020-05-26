@@ -3,23 +3,32 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>   
-
-/* #include "inirw_internal.h" */ 
+/*#define TESTLIBD*/
+/*#define LIBINSTALLED*/
+#ifdef TESTLIBD
+#include <dlfcn.h>
+#endif
+#ifdef LIBINSTALLED
+#include <lightconfini.h>
+#else
 #include "lightconfini.h"
+#endif
 #include "main.h"
 #define main_c  
+
+#ifdef LIBINSTALLED 
+const char* linkpath = "liblightconfini.so.1";
+#else
+const char* linkpath = "./libdir/liblightconfini.so.1";
+#endif
 
 
 /* int lens=46, lenp=36, lenv=56, lenc=74, elen=65; */
 int lens=16, lenp=16, lenv=16, lenc=24, elen=55;
 lcinimyReadFunc mylciniReadOutFunct=myfunct;
-/*lcinimyReadFunc mylciniReadOutFunct=NULL;*/
-
-
-
+/*lcinimyReadFunc  *mylciniReadOutFunct=NULL;*/
 char *search_sec = "bom_section";
 char *search_par = "mmm";
-
 
 
 
@@ -37,12 +46,92 @@ int main(int argc, char* argv[]){
     lcini_data *ini=NULL, *tmp=NULL;
     FILE *fp;
     lcini_shortret *sret=NULL, *sret2=NULL;
-
+#ifdef TESTLIBD
+    void *hl;
+    size_t              (*lciniFileMaxLineLen)(FILE *tfd);
+    struct lcini_data  *(*lciniReadOut)(const char *filename);
+    int                 (*lciniReadOutOwn)(const char *filename);
+    lcini_data         *(*lciniGet)(lcini_data *head, const char *section, const char *parameter); 
+    int                 (*lciniGetStr)(lcini_data *head, const char *section, const char *parameter, char *dst, int dstlen);
+    lcini_shortret     *(*lciniGetShort)(lcini_data *head, const char *section, const char *parameter, lcini_shortret *ret);
+    lcini_shortret     *(*lciniGetFromFileShort)(const char *filename, const char *section, const char *parameter, lcini_shortret *ret);
+    int                 (*lciniGetFromFileStr)(const char *filename, const char *section, const char *parameter, char *dst, int dstlen);
+    lcini_data         *(*lciniDestroyNodes)( lcini_data *head); 
+    /*lcini_data         *(*lciniCreateNode)( lcini_data *head, int lineLen ); */
+    /*lcini_shortret     *(*lciniMKShortRet)(int bufflen); */
+    void                (*lciniDestroyShortRet)(lcini_shortret *dt);
+#endif
     if(argc > 1){
         memset(filename, 0, 4096);
         /* snprintf(filename, 4096, "%s", argv[1]); */
         sprintf(filename, "%s", argv[1]);
     }
+    if(argc > 2){
+        search_sec = argv[2];
+    }
+    if(argc > 3){
+        search_par = argv[3];
+    }
+
+#ifdef TESTLIBD
+    hl = dlopen(linkpath, RTLD_LAZY);
+    if(!hl){
+        printf("\nDynamic Library load error - %s \nexit\n",dlerror());
+        exit(1);
+    }
+    lciniFileMaxLineLen = dlsym(hl, "lciniFileMaxLineLen");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniReadOut = dlsym(hl, "lciniReadOut");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniReadOutOwn = dlsym(hl, "lciniReadOutOwn");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniGet = dlsym(hl,"lciniGet");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniGetStr = dlsym(hl,"lciniGetStr");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniGetShort = dlsym(hl,"lciniGetShort");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniGetFromFileShort = dlsym(hl, "lciniGetFromFileShort");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniGetFromFileStr = dlsym(hl,"lciniGetFromFileStr");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    lciniDestroyNodes = dlsym(hl,"lciniDestroyNodes");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+    /*lciniCreateNode = dlsym(hl,"lciniCreateNode");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }*/
+    /*lciniMKShortRet = dlsym(hl,"lciniMKShortRet");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }*/
+    lciniDestroyShortRet = dlsym(hl,"lciniDestroyShortRet");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
+
+  
+#endif
+
+
     fp = fopen(filename, "rb");
     len = lciniFileMaxLineLen(fp)+1;
     if(fp != NULL) { fclose(fp);}
@@ -85,7 +174,7 @@ int main(int argc, char* argv[]){
   
 
     printf("\n\nFUNC: lciniReadOutOwn():\n\n");
-    /* lciniReadOutOwn(filename); */
+    lciniReadOutOwn(filename); 
 
 
 
@@ -117,7 +206,7 @@ int main(int argc, char* argv[]){
 
 
     printf("\n\nFUNC: lciniGetFromFileShort():\n\n");
-     sret2 = lciniGetFromFileShort(filename, search_sec, search_par, NULL);
+    sret2 = lciniGetFromFileShort(filename, search_sec, search_par, sret2);
     printf("---\n");
     if(sret2){
         printf("SR: '%s', %d, t: ",sret2->ret,sret2->retlen);
@@ -131,7 +220,7 @@ int main(int argc, char* argv[]){
     }
 
     printf("\n\nFUNC: lciniGetFromFileStr():\n\n");
-    /* r=lciniGetFromFileStr(filename, search_sec, search_par, buff6, 100); */
+    r=lciniGetFromFileStr(filename, search_sec, search_par, buff6, 100); 
     printf("r: %d, R: '%s' \n",r,buff6);
 
 
@@ -145,5 +234,8 @@ int main(int argc, char* argv[]){
     free(buff5); 
     free(buff6);
     printf("\n -- end --\n");
+#ifdef TESTLIBD
+    dlclose(hl);
+#endif
     return 0;
 }

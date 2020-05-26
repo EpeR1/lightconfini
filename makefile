@@ -1,4 +1,4 @@
-.PHONY: all clean main test testlib testlibd install copylib ldconf lib debug distclean
+.PHONY: all clean mkdir main test testlib testlibd install copylib ldconf lib debug distclean
 
 # buid & link with gcc
 CC = gcc
@@ -45,24 +45,26 @@ test: clean $(PROG)
 lib:  $(PROG) ldconf
 debug: clean $(PROG)
 install: lib copylib 
-testlib: lib ldconf clean main
-testlibd: lib ldconf clean main
+#testlib: lib ldconf clean main
+#testlibd: lib ldconf clean main
+testlib: clean mkdir main
+testlibd: clean mkdir main
 
 # debug-hoz felüldefiniálva 
-debug: CFLAGS = -Wall -c -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
+debug: CFLAGS = -Wall -c  -O0 -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 debug: LDLIBS = -lefence
 # make lib  FLAGS: not link: -c, relative addresses: -fPIC
 lib: CFLAGS = -fPIC -c -Wall -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
 lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.$(LASTMAINT)
 lib: LDLIBS = -lc
 # nem mindegy, hogy mellette van, vagy alatta egy sorral!
-testlib: LDFLAGS = -L $(PWD)/$(LIBDIR)/
+#testlib: LDFLAGS = -L $(PWD)/$(LIBDIR)/
 testlib: LDLIBS = -llightconfini
-testlib: PREP = TESTLIB
 #Dinamikus betöltés tesztelése
 testlibd: LDFLAGS = -rdynamic
 testlibd: LDLIBS = -ldl
-testlibd: PREP = TESTLIBD
+testlibd: PREP = -D"TESTLIBD"
+#testlibd: PREP = -D"TESTLIBD" -D"LIBINSTALLED"
 
 
 # Ha még nem létezik az obj könyvtár, létrehozza
@@ -81,7 +83,7 @@ $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 # A main újrafordítása
 main:
-	$(CC) $(CFLAGS) -D"$(PREP)" -o $(OBJDIR)/main.o $(SRCDIR)/main.c 
+	$(CC) $(CFLAGS) $(PREP) -o $(OBJDIR)/main.o $(SRCDIR)/main.c 
 	$(LD) $(LDFLAGS) $(OBJDIR)/main.o -o $(PROG) $(LDLIBS)
 
 # OBJ létrehozáshoz
@@ -95,13 +97,18 @@ $(LIBDIR):
 rebuild: clean all
 
 copylib:
-	$(CP) -r $(LIBDIR)/* /usr/local/lib/ 
+	$(CP) -f $(SRCDIR)/lightconfini.h /usr/local/include/
+	$(CP) -f $(LIBDIR)/* /usr/local/lib/ 
 	ln -sf /usr/local/lib/liblightconfini.so.$(LASTVERT) /usr/local/lib/liblightconfini.so
 	ldconfig
 
 ldconf:
 	ln -sf $(PWD)/$(LIBDIR)/liblightconfini.so.$(LASTVERT) $(PWD)/$(LIBDIR)/liblightconfini.so
-	ldconfig -n $(PWD)/$(LIBDIR)/
+	#ldconfig -n $(PWD)/$(LIBDIR)/
+
+mkdir:
+	$(MKD) $(BINDIR)
+	$(MKD) $(OBJDIR)
 
 clean:
 	$(RM) $(OBJS) 

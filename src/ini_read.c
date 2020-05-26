@@ -588,7 +588,7 @@ struct lcini_data *iniFSM(struct lcini_data *data, const uint8_t *in, int32_t le
 lcini_data *lciniCreateNode( lcini_data *head, int lineLen ){ /* Creates one Node */
     lcini_data *curr;
 
-    curr = (lcini_data *) malloc(1*sizeof(lcini_data));
+    curr = (lcini_data *) calloc(1, sizeof(lcini_data));
     curr->nodeState = lcini_EMPTY; 
     curr->lineNum = 0;
     curr->lineLen = lineLen;
@@ -600,6 +600,11 @@ lcini_data *lciniCreateNode( lcini_data *head, int lineLen ){ /* Creates one Nod
         curr->comment  = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
         curr->errorMsg = (uint8_t *) calloc(lineLen, sizeof(uint8_t));
     } else {
+        curr->section = NULL;
+        curr->param = NULL;
+        curr->value = NULL;
+        curr->comment = NULL;
+        curr->errorMsg = NULL;
         lineLen = 0;
     }
     curr->sectionLen = lineLen;
@@ -641,7 +646,7 @@ lcini_data *lciniDestroyNodes( lcini_data *head){ /* Destroys Nodes from HEAD to
 lcini_shortret *lciniMKShortRet(int bufflen){
     lcini_shortret *dt=NULL;
 
-    dt = (lcini_shortret *) malloc(1*sizeof(lcini_shortret));
+    dt = (lcini_shortret *) calloc(1, sizeof(lcini_shortret));
     if(dt){
         dt->ret = (char *) calloc(bufflen, sizeof(char));
         dt->retlen = bufflen;
@@ -747,7 +752,7 @@ struct lcini_data *lciniReadOut(const char *filename){      /* Reads the entire 
     }
     return list;
 }
-
+ 
 
 
 int lciniReadOutOwn(const char *filename){      /* Reads the entire file to a linked-list */
