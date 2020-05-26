@@ -13,7 +13,7 @@
 
 
 
-static size_t strNullLen(const uint8_t *str){
+size_t strNullLen(const uint8_t *str){
     if(str == NULL){
         return 0;
     } else { 
@@ -22,7 +22,7 @@ static size_t strNullLen(const uint8_t *str){
 }
 
 
-static size_t strLcpy(uint8_t *dst, size_t dstlen, const uint8_t *src, size_t srclen){  /* Safe strncpy() */
+size_t strLcpy(uint8_t *dst, size_t dstlen, const uint8_t *src, size_t srclen){  /* Safe strncpy() */
     uint8_t *tdst=dst; 
     const uint8_t *tsrc=src;
     size_t i=dstlen, j=srclen;
@@ -39,7 +39,7 @@ static size_t strLcpy(uint8_t *dst, size_t dstlen, const uint8_t *src, size_t sr
 }
 
 
-static uint8_t *lciniStrResize(uint8_t *ptr, size_t oldsize, size_t newsize){
+uint8_t *lciniStrResize(uint8_t *ptr, size_t oldsize, size_t newsize){
     uint8_t *tmp=NULL;
 
     if(newsize <= 0){           /* deleting */
@@ -67,7 +67,7 @@ static uint8_t *lciniStrResize(uint8_t *ptr, size_t oldsize, size_t newsize){
 }
 
 
-static uint8_t unescape(uint8_t c){
+uint8_t unescape(uint8_t c){
     if(c == 'n'){            /* Newline */
         return '\n';
     } else if(c == 'a'){     /* Bell */
@@ -92,7 +92,7 @@ static uint8_t unescape(uint8_t c){
 }
 
 #ifdef ini_write_c
-static uint8_t eescape(uint8_t c){
+uint8_t eescape(uint8_t c){
     if(c == '\n'){          /* Newline */
         return 'n';
     } else if(c == '\a'){   /* Bell */
@@ -115,7 +115,7 @@ static uint8_t eescape(uint8_t c){
 }
 #endif
 
-static uint8_t isascalnum(uint8_t c){ /* Check if input is ASCII Alpha-numeric */
+uint8_t isascalnum(uint8_t c){ /* Check if input is ASCII Alpha-numeric */
     if( 0x30 <= c && c <= 0x39){    /* Numeric */
         return 1;
     } else if (0x41 <= c && c <= 0x5a){ /* UPPER */
@@ -127,7 +127,7 @@ static uint8_t isascalnum(uint8_t c){ /* Check if input is ASCII Alpha-numeric *
     }
 }
 
-static uint8_t checkspace(uint8_t c){  /* Only for ASCII characters */
+uint8_t checkspace(uint8_t c){  /* Only for ASCII characters */
     switch (c) {
     case 0x20:      /* space (SPC) */
         return 1;
@@ -171,7 +171,7 @@ size_t lciniFileMaxLineLen(FILE *tfd){
     }       
 }
 
-static struct lcini_data *iniFSM(struct lcini_data *data, const uint8_t *in, int32_t len){
+struct lcini_data *iniFSM(struct lcini_data *data, const uint8_t *in, int32_t len){
 
     int32_t i,j, vallen=len; 
     enum lcini_states pstate=Start, state=Start;

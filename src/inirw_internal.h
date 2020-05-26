@@ -42,20 +42,20 @@ size_t getFileMaxLineLen(FILE *tfd);
 
 #if defined(ini_read_c) || defined(ini_write_c)
     enum lcini_states {Start, BgnSp, CommEndW, SectEndW, SectEndD, EqW1, EqW2, ValPSP, ValW, ValFSP, DqmW, Bslsh, Error, Stop };
-    static size_t strNullLen(const uint8_t *str);
-    static struct lcini_data *iniFSM(struct lcini_data *data, const uint8_t *in, int32_t len);
+    size_t strNullLen(const uint8_t *str);
+    struct lcini_data *iniFSM(struct lcini_data *data, const uint8_t *in, int32_t len);
 
-    static uint8_t isascalnum(uint8_t c); /* Check if input is ASCII Alpha-numeric */
-    static uint8_t checkspace(uint8_t c);  /* Only for ASCII characters */
-    static size_t strLcpy(uint8_t *dst, size_t dstlen, const uint8_t *src, size_t srclen);
-    static uint8_t *lciniStrResize(uint8_t *ptr, size_t oldsize, size_t newsize);
-    static uint8_t unescape(uint8_t c);
+    uint8_t isascalnum(uint8_t c); /* Check if input is ASCII Alpha-numeric */
+    uint8_t checkspace(uint8_t c);  /* Only for ASCII characters */
+    size_t strLcpy(uint8_t *dst, size_t dstlen, const uint8_t *src, size_t srclen);
+    uint8_t *lciniStrResize(uint8_t *ptr, size_t oldsize, size_t newsize);
+    uint8_t unescape(uint8_t c);
 
 #ifdef ini_read_c
 /* int unescape(int c); */
 #endif /* ini_read_c */
 #ifdef ini_write_c
-    static uint8_t eescape(uint8_t c);
+      uint8_t eescape(uint8_t c);
 #endif /*ini_write_c*/
 #endif /* ini_read_c, ini_write_c*/
 
