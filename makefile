@@ -12,10 +12,12 @@ CP = -/bin/cp
 
 # fordíto általános flagek
 PWD = $(shell pwd)
+#LASTVER = 2.0.0
 LASTVER = $(shell git describe)
 LASTVERT = $(shell git describe --tags --abbrev=0)
 LASTMAINT = $(firstword $(subst ., ,$(LASTVERT)))
-CFLAGS = -Wall -c -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
+VERSTRING = -D"GIT_LAST=\"$(LASTVER)\"" -D"GIT_LASTT=\"$(LASTVERT)\"" -D"GIT_MAINT=\"$(LASTMAINT)\""
+CFLAGS = -Wall -c $(VERSTRING)
 LDFLAGS = 
 LDLIBS =
 PREP=
@@ -25,7 +27,6 @@ BINDIR = bin
 LIBDIR = libdir
 OBJDIR = build
 SRCDIR = src
-#LASTVER = 2.0.0
 
 
 # .o fájlok
@@ -51,19 +52,20 @@ testlib: clean mkdir main
 testlibd: clean mkdir main
 
 # debug-hoz felüldefiniálva 
-debug: CFLAGS = -Wall -c  -O0 -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
+debug: CFLAGS = -Wall -c  -O0 -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes $(VERSTRING)
 debug: LDLIBS = -lefence
 # make lib  FLAGS: not link: -c, relative addresses: -fPIC
-lib: CFLAGS = -fPIC -c -Wall -D"GIT_LAST=$(LASTVER)" -D"GIT_LASTT=$(LASTVERT)" -D"GIT_MAINT=$(LASTMAINT)"
+lib: CFLAGS = -fPIC -c -Wall $(VERSTRING)
 lib: LDFLAGS = -shared -Wl,-soname,liblightconfini.so.$(LASTMAINT)
 lib: LDLIBS = -lc
 # nem mindegy, hogy mellette van, vagy alatta egy sorral!
-#testlib: LDFLAGS = -L $(PWD)/$(LIBDIR)/
+testlib: LDFLAGS = -L $(PWD)/$(LIBDIR)/
 testlib: LDLIBS = -llightconfini
 #Dinamikus betöltés tesztelése
 testlibd: LDFLAGS = -rdynamic
 testlibd: LDLIBS = -ldl
 testlibd: PREP = -D"TESTLIBD"
+#Load lib from /user/local/lib/
 #testlibd: PREP = -D"TESTLIBD" -D"LIBINSTALLED"
 
 
@@ -98,13 +100,13 @@ rebuild: clean all
 
 copylib:
 	$(CP) -f $(SRCDIR)/lightconfini.h /usr/local/include/
-	$(CP) -f $(LIBDIR)/* /usr/local/lib/ 
+	$(CP) -fd $(LIBDIR)/* /usr/local/lib/ 
 	ln -sf /usr/local/lib/liblightconfini.so.$(LASTVERT) /usr/local/lib/liblightconfini.so
 	ldconfig
 
 ldconf:
 	ln -sf $(PWD)/$(LIBDIR)/liblightconfini.so.$(LASTVERT) $(PWD)/$(LIBDIR)/liblightconfini.so
-	#ldconfig -n $(PWD)/$(LIBDIR)/
+	ldconfig -n $(PWD)/$(LIBDIR)/
 
 mkdir:
 	$(MKD) $(BINDIR)

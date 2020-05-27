@@ -59,6 +59,7 @@ size_t lciniFileMaxLineLen(FILE *tfd);
 
 lcini_shortret *lciniMKShortRet(int bufflen);
 void lciniDestroyShortRet(lcini_shortret *dt);
+char *lciniGetVersionStr(void);
 
 #endif /* LIGHTCONFINI_H_INCLUDED */
 

@@ -60,6 +60,7 @@ int main(int argc, char* argv[]){
     /*lcini_data         *(*lciniCreateNode)( lcini_data *head, int lineLen ); */
     /*lcini_shortret     *(*lciniMKShortRet)(int bufflen); */
     void                (*lciniDestroyShortRet)(lcini_shortret *dt);
+    char               *(*lciniGetVersionStr)(void);
 #endif
     if(argc > 1){
         memset(filename, 0, 4096);
@@ -78,6 +79,8 @@ int main(int argc, char* argv[]){
     if(!hl){
         printf("\nDynamic Library load error - %s \nexit\n",dlerror());
         exit(1);
+    } else {
+        printf("\nDynamic Library loaded: %s", linkpath);
     }
     lciniFileMaxLineLen = dlsym(hl, "lciniFileMaxLineLen");
     if((buff1 = dlerror()) != NULL){
@@ -127,8 +130,11 @@ int main(int argc, char* argv[]){
     if((buff1 = dlerror()) != NULL){
         printf("\nsym err - %s\n", buff1);
     }
+    lciniGetVersionStr = dlsym(hl, "lciniGetVersionStr");
+    if((buff1 = dlerror()) != NULL){
+        printf("\nsym err - %s\n", buff1);
+    }
 
-  
 #endif
 
 
@@ -233,6 +239,7 @@ int main(int argc, char* argv[]){
     free(buff4);
     free(buff5); 
     free(buff6);
+    printf("\n\nLightConfINI Version: %s \n", lciniGetVersionStr());
     printf("\n -- end --\n");
 #ifdef TESTLIBD
     dlclose(hl);

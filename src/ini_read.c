@@ -994,3 +994,13 @@ int lciniGetFromFileStr(const char *filename, const char *section, const char *p
     }
     return r;
 }
+
+
+char *lciniGetVersionStr(void){
+#ifdef GIT_LAST
+    char *ret = GIT_LAST;
+# else 
+    char *ret = "";
+#endif
+    return ret;
+}
