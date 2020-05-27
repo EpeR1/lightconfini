@@ -1,5 +1,5 @@
-#ifndef INI_READ_H_INCLUDED
-#define INI_READ_H_INCLUDED
+#ifndef INI_RWINT_H_INCLUDED
+#define INI_RWINT_H_INCLUDED
 #include <stdint.h> /* int64_t*/
 #include "lightconfini.h"
  

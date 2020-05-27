@@ -27,11 +27,11 @@ typedef struct lcini_data {
     struct lcini_data *next; 
 } lcini_data;
 
- 
+typedef enum lcini_shortretType{lcini_shortretOK, lcini_shortretERROR, lcini_shortretEMPTY} lcini_shortretType; 
 typedef struct lcini_shortret{
     char *ret;
     int retlen;
-    enum retType{lcini_shortretOK, lcini_shortretERROR, lcini_shortretEMPTY} retType;
+    lcini_shortretType retType;
 } lcini_shortret;
 
 /* Ha maga függvény van átpakolva, nevestül, testestül */
