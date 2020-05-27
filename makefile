@@ -46,10 +46,11 @@ test: clean $(PROG)
 lib:  $(PROG) ldconf
 debug: clean $(PROG)
 install: lib copylib 
-#testlib: lib ldconf clean main
-#testlibd: lib ldconf clean main
-testlib: clean mkdir main
-testlibd: clean mkdir main
+testlib: lib ldconf clean main
+testlibd: lib ldconf clean main
+# A lib újrafordítása nélkül:
+#testlib: clean mkdir main
+#testlibd: clean mkdir main
 
 # debug-hoz felüldefiniálva 
 debug: CFLAGS = -Wall -c  -O0 -g -g3 -ggdb -std=c89 -Wpedantic -Wmissing-prototypes $(VERSTRING)
